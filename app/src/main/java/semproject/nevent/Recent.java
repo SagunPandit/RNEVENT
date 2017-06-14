@@ -20,7 +20,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import static semproject.nevent.HomePage.staticadapter;
@@ -34,6 +38,7 @@ public class Recent extends Fragment implements ConnectivityReceiver.Connectivit
     private RecyclerView mRecyclerView;
     String STRING_TAG="RECENT";
     String username;
+    String current_date;
     List<String> eventId=new ArrayList<>();
     List<String>eventList=new ArrayList<>();
     List<String>eventLocation=new ArrayList<>();
@@ -45,6 +50,7 @@ public class Recent extends Fragment implements ConnectivityReceiver.Connectivit
     static public List<Double>longitude=new ArrayList<>();
     List<String>slatitude=new ArrayList<>();
     List<String>slongitude=new ArrayList<>();
+    List<Integer>outdatedEvent= new ArrayList<>();
 
     public static List<String> extracteventId=new ArrayList<>();
     public static List<String>extracteventList=new ArrayList<>();
@@ -60,6 +66,7 @@ public class Recent extends Fragment implements ConnectivityReceiver.Connectivit
     public Recent() {
         staticeventRecyclerView=new EventRecyclerView();
         staticadapter=new EventRecyclerView.AllItemAdapter();
+        extractTime();
     }
 
 
@@ -135,66 +142,113 @@ public class Recent extends Fragment implements ConnectivityReceiver.Connectivit
                             Log.e(STRING_TAG,Integer.toString(len));
                             //for eventId
                             for (int i=0;i<len;i++){
-                                eventId.add(jsonArray6.get(i).toString());
-                                extracteventId.add(jsonArray6.get(i).toString());
+                                /*eventId.add(jsonArray6.get(i).toString());
+                                extracteventId.add(jsonArray6.get(i).toString());*/
+                                if(compareDate(jsonArray3.get(i).toString())){
+                                    eventId.add(jsonArray6.get(i).toString());
+                                    extracteventId.add(jsonArray6.get(i).toString());
+                                }
+                                else{
+                                    Log.e(STRING_TAG,jsonArray6.get(i).toString());
+                                    outdatedEvent.add(Integer.valueOf(jsonArray6.get(i).toString()));}
                             }
                             //for eventname
                             for (int i=0;i<len;i++){
-                                eventList.add(jsonArray.get(i).toString());
-                                extracteventList.add(jsonArray.get(i).toString());
+                               /* eventList.add(jsonArray.get(i).toString());
+                                extracteventList.add(jsonArray.get(i).toString());*/
+                                if(compareDate(jsonArray3.get(i).toString())) {
+                                    eventList.add(jsonArray.get(i).toString());
+                                    extracteventList.add(jsonArray.get(i).toString());
+                                }
                             }
                             //for eventlocation
                             for (int i=0;i<len;i++){
-                                eventLocation.add(jsonArray2.get(i).toString());
-                                extracteventLocation.add(jsonArray2.get(i).toString());
+                               /* eventLocation.add(jsonArray2.get(i).toString());
+                                extracteventLocation.add(jsonArray2.get(i).toString());*/
+                                if(compareDate(jsonArray3.get(i).toString())) {
+                                    eventLocation.add(jsonArray2.get(i).toString());
+                                    extracteventLocation.add(jsonArray2.get(i).toString());
+                                }
                             }
                             //for eventdate
                             for (int i=0;i<len;i++){
-                                eventDate.add(jsonArray3.get(i).toString());
-                                extracteventDate.add(jsonArray3.get(i).toString());
+                               /* eventDate.add(jsonArray3.get(i).toString());
+                                extracteventDate.add(jsonArray3.get(i).toString());*/
+                                if(compareDate(jsonArray3.get(i).toString())){
+                                    eventDate.add(jsonArray3.get(i).toString());
+                                    extracteventDate.add(jsonArray3.get(i).toString());
+                                }
                             }
                             //for eventcategory
                             for (int i=0;i<len;i++){
-                                eventCategory.add(jsonArray4.get(i).toString());
-                                extracteventCategory.add(jsonArray4.get(i).toString());
+                               /* eventCategory.add(jsonArray4.get(i).toString());
+                                extracteventCategory.add(jsonArray4.get(i).toString());*/
+                                if(compareDate(jsonArray3.get(i).toString())) {
+                                    eventCategory.add(jsonArray4.get(i).toString());
+                                    extracteventCategory.add(jsonArray4.get(i).toString());
+                                }
                             }
                             //for eventorganizer
                             for (int i=0;i<len;i++){
-                                eventOrganizer.add(jsonArray5.get(i).toString());
-                                extracteventOrganizer.add(jsonArray5.get(i).toString());
+                               /* eventOrganizer.add(jsonArray5.get(i).toString());
+                                extracteventOrganizer.add(jsonArray5.get(i).toString());*/
+                                if(compareDate(jsonArray3.get(i).toString())) {
+                                    eventOrganizer.add(jsonArray5.get(i).toString());
+                                    extracteventOrganizer.add(jsonArray5.get(i).toString());
+                                }
                             }
                             //for count
                             for (int i=0;i<len;i++){
-                                viewcount.add((Integer) jsonArray7.get(i));
-                                extractviewcount.add((Integer) jsonArray7.get(i));
+                               /* viewcount.add((Integer) jsonArray7.get(i));
+                                extractviewcount.add((Integer) jsonArray7.get(i));*/
+                                if(compareDate(jsonArray3.get(i).toString())) {
+                                    viewcount.add((Integer) jsonArray7.get(i));
+                                    extractviewcount.add((Integer) jsonArray7.get(i));
+                                }
                             }
                             //for longitude
                             for (int i=0;i<len;i++){
-                                try{
+                               /* try {
                                     longitude.add(Double.parseDouble(jsonArray9.get(i).toString()));
                                     extractlongitude.add(Double.parseDouble(jsonArray9.get(i).toString()));
-                                }
-                                catch (NumberFormatException e)
-                                {
+                                } catch (NumberFormatException e) {
                                     longitude.add(1.00000);
                                     extractlongitude.add(1.00000);
+                                }*/
+                                if(compareDate(jsonArray3.get(i).toString())) {
+                                    try {
+                                        longitude.add(Double.parseDouble(jsonArray9.get(i).toString()));
+                                        extractlongitude.add(Double.parseDouble(jsonArray9.get(i).toString()));
+                                    } catch (NumberFormatException e) {
+                                        longitude.add(1.00000);
+                                        extractlongitude.add(1.00000);
+                                    }
                                 }
-
                             }
                             //for latitude
                             for (int i=0;i<len;i++){
-                                try{
+                                /*try{
                                     latitude.add(Double.parseDouble(jsonArray8.get(i).toString()));
                                     extractlatitude.add(Double.parseDouble(jsonArray8.get(i).toString()));
                                 }
-                                catch (NumberFormatException e)
-                                {
+                                catch (NumberFormatException e) {
                                     latitude.add(1.00000);
                                     extractlatitude.add(1.00000);
+                                }*/
+                                if(compareDate(jsonArray3.get(i).toString())){
+                                    try{
+                                        latitude.add(Double.parseDouble(jsonArray8.get(i).toString()));
+                                        extractlatitude.add(Double.parseDouble(jsonArray8.get(i).toString()));
+                                    }
+                                    catch (NumberFormatException e) {
+                                        latitude.add(1.00000);
+                                        extractlatitude.add(1.00000);
+                                    }
                                 }
                             }
 
                             retreiveFromDatabase(mRecyclerView, getContext());
+                            deleteOutdated();
                         }
                         else
                             Log.e(STRING_TAG,"insideNull");
@@ -218,6 +272,97 @@ public class Recent extends Fragment implements ConnectivityReceiver.Connectivit
             queue.add(recyclerRequest);
         }
     }
+
+    public void extractTime(){
+        /*Response.Listener<String> responseListener= new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try{
+                    JSONObject jsonObject=new JSONObject(response);
+                    String date_str= jsonObject.getString("time");
+                    String[] split_date= date_str.split(" ");
+                    current_date=split_date[0];
+                    Log.e(STRING_TAG+" Download",current_date);
+                } catch (JSONException e) {
+                    Log.e(STRING_TAG+" Download","exception");
+                    e.printStackTrace();
+                }
+            }
+        };
+        if(checkConnection(getContext())){
+            TimeRequest timeRequest=new TimeRequest(responseListener);
+            RequestQueue queue = Volley.newRequestQueue(getContext());
+            queue.add(timeRequest);
+        }*/
+        Calendar c = Calendar.getInstance();
+        int day = c.get(Calendar.DATE);
+        int month= c.get(Calendar.MONTH)+1;
+        int year= c.get(Calendar.YEAR);
+        current_date=String.valueOf(day)+"-"+ String.valueOf(month)+"-"+ String.valueOf(year);
+        Log.e(STRING_TAG+" Date", String.valueOf(day)+"-"+ String.valueOf(month)+"-"+ String.valueOf(year));
+    }
+
+
+    private boolean compareDate(String comp_date){
+        try {
+            Log.e(STRING_TAG,comp_date);
+            Log.e(STRING_TAG,current_date);
+
+           /* DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+            Date date = df.parse(current_date);
+            Log.e(STRING_TAG,"Checking2 "+ String.valueOf(date));*/
+
+            Date current = new SimpleDateFormat("dd-MM-yyyy").parse(current_date);
+            Date comp = new SimpleDateFormat("dd/MM/yyyy").parse(comp_date);
+            Log.e(STRING_TAG,"Checking2");
+/*            if (comp.compareTo(current)> 0) {
+                System.out.println("start is after end");
+            } else if (current.compareTo(comp) < 0) {
+                System.out.println("start is before end");
+            } else if (current.compareTo(comp) == 0) {
+                System.out.println("start is equal to end");
+            } else {
+                System.out.println("Something weird happened...");
+            }*/
+            if (comp.compareTo(current)<0){
+                Log.e(STRING_TAG,"Return False");
+                return false;}
+
+        } catch (ParseException e) {
+            Log.e(STRING_TAG,"exception");
+            e.printStackTrace();
+        }
+        Log.e(STRING_TAG,"Return true");
+        return true;
+    }
+
+    private void deleteOutdated(){
+        for(int id: outdatedEvent){
+            Response.Listener<String> responseListener= new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    try {
+                        Log.e(STRING_TAG,"inside outdated");
+                        JSONObject jsonObject=new JSONObject(response);
+                        boolean success = jsonObject.getBoolean("success");
+                        if(success){
+                            Log.e(STRING_TAG,"deleted events");
+                        }
+                        else
+                            Log.e(STRING_TAG,"Not deleted events");
+                    }
+                    catch(JSONException e) {
+                        e.printStackTrace();
+                    }
+                };
+            };
+            DeleteOutdatedRequest deleteOutdatedRequest= new DeleteOutdatedRequest(id,responseListener);
+            RequestQueue queue = Volley.newRequestQueue(getContext());
+            queue.add(deleteOutdatedRequest);
+
+        }
+    }
+
 
     private boolean checkConnection(Context context) {
         Log.e(STRING_TAG,"checkConnection");
