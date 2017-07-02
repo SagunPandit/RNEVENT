@@ -13,7 +13,7 @@ import java.util.Map;
  */
 
 public class DeleteOutdatedRequest extends StringRequest {
-    final String STRING_TAG= "RecyclerRequest";
+    final String STRING_TAG= "DeleteOutRequest";
     private static final String REGISTER_REQUEST_URL = "http://avashadhikari.com.np/DeleteOut.php";
     private Map<String, String> params; //maps key to value dont have fixed size any number of values can be stored.
 

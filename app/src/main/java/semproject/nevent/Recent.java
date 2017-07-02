@@ -2,15 +2,19 @@ package semproject.nevent;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -248,7 +252,7 @@ public class Recent extends Fragment implements ConnectivityReceiver.Connectivit
                             }
 
                             retreiveFromDatabase(mRecyclerView, getContext());
-                            deleteOutdated();
+                           new BackgroundDelete().execute();
                         }
                         else
                             Log.e(STRING_TAG,"insideNull");
@@ -281,7 +285,7 @@ public class Recent extends Fragment implements ConnectivityReceiver.Connectivit
                     JSONObject jsonObject=new JSONObject(response);
                     String date_str= jsonObject.getString("time");
                     String[] split_date= date_str.split(" ");
-                    current_date=split_date[0];
+                    current_date=split_date[0]; //2017-07-01 09:54
                     Log.e(STRING_TAG+" Download",current_date);
                 } catch (JSONException e) {
                     Log.e(STRING_TAG+" Download","exception");
@@ -338,6 +342,7 @@ public class Recent extends Fragment implements ConnectivityReceiver.Connectivit
 
     private void deleteOutdated(){
         for(int id: outdatedEvent){
+            Log.e("DeleteOut","inside loop");
             Response.Listener<String> responseListener= new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
@@ -387,5 +392,32 @@ public class Recent extends Fragment implements ConnectivityReceiver.Connectivit
             startActivity(intent);
 
         }
+    }
+
+
+    private class BackgroundDelete extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            Log.e("DeleteOut", "insidedoinback");
+            deleteOutdated();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            String toastMesg = "App is up-to-date";
+            Toast toast = Toast.makeText(getContext(), toastMesg, Toast.LENGTH_SHORT);
+            TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
+            if (v != null) v.setGravity(Gravity.CENTER);
+            toast.show();
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+
+        }
+
     }
 }
