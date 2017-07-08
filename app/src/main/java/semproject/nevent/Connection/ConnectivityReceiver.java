@@ -1,4 +1,4 @@
-package semproject.nevent;
+package semproject.nevent.Connection;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;

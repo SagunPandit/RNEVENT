@@ -16,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -32,9 +31,14 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+
+import semproject.nevent.Connection.ConnectivityReceiver;
+import semproject.nevent.Connection.InternetConnection;
+import semproject.nevent.EventRecyclerView;
+import semproject.nevent.MainActivity;
+import semproject.nevent.R;
+import semproject.nevent.Request.RecyclerRequest;
 
 import static semproject.nevent.MainActivity.PreferenceFile;
 

@@ -1,4 +1,4 @@
-package semproject.nevent;
+package semproject.nevent.Request;
 
 import android.util.Log;
 

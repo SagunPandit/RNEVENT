@@ -1,22 +1,10 @@
 package semproject.nevent;
 
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -27,9 +15,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -39,16 +24,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import static semproject.nevent.ShowEvents.la;
-import static semproject.nevent.ShowEvents.ln;
+import semproject.nevent.Connection.ConnectivityReceiver;
+import semproject.nevent.Connection.InternetConnection;
+import semproject.nevent.MapsActivities.ShowEvents;
+import semproject.nevent.Request.RecyclerRequest;
 
-public class HomePage extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,ConnectivityReceiver.ConnectivityReceiverListener,SearchView.OnQueryTextListener {
+public class HomePage extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,ConnectivityReceiver.ConnectivityReceiverListener{
     final String STRING_TAG= "HomePage";
     NavigationView navigationView=null;
     Toolbar toolbar=null;
@@ -56,64 +40,71 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
     Context context;
     int id;
     static EventRecyclerView staticeventRecyclerView = new EventRecyclerView();
+    static EventRecyclerView stat_forsearch_eventRecyclerView = new EventRecyclerView();
+
     static EventRecyclerView.AllItemAdapter staticadapter=new EventRecyclerView.AllItemAdapter();
+    static EventRecyclerView.FollowItemAdapter stat_forsearch_Useradapter=new EventRecyclerView.FollowItemAdapter();
+
     static ShowEvents showEvents;
+
+    List<String>userid=new ArrayList<>();
+    List<String>fusername=new ArrayList<>();
+    List<String>useremail=new ArrayList<>();
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
 
+        staticeventRecyclerView = new EventRecyclerView();
+        stat_forsearch_eventRecyclerView = new EventRecyclerView();
+        staticadapter=new EventRecyclerView.AllItemAdapter();
+        stat_forsearch_Useradapter=new EventRecyclerView.FollowItemAdapter();
 
-            Intent intent = getIntent();
-            username = intent.getStringExtra("username");
-            id=intent.getIntExtra("id",3);
-            Button userbutton=(Button)findViewById(R.id.user_button);
-            userbutton.setText(username);
+        Intent intent = getIntent();
+        username = intent.getStringExtra("username");
+        id=intent.getIntExtra("id",3);
+        Button userbutton=(Button)findViewById(R.id.user_button);
+        userbutton.setText(username);
 
-            if (id==1)
-            {
-                Recent recent = new Recent();
-                Bundle bundle = new Bundle();
-                bundle.putString("username", username);
-                bundle.putInt("id",id);
-                android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.fragment_container, recent);
-                recent.setArguments(bundle);
-                fragmentTransaction.commit();
-            }
-            else if(id==2)
-            {
-                NearByList nearByList = new NearByList();
-                Bundle bundle = new Bundle();
-                bundle.putString("username", username);
-                android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.fragment_container, nearByList);
-                nearByList.setArguments(bundle);
-                fragmentTransaction.commit();
-            }
-            toolbar = (Toolbar) findViewById(R.id.toolbar);
-             setSupportActionBar(toolbar);
-             getSupportActionBar().setDisplayShowTitleEnabled(false);
-             toolbar.setLogo(R.drawable.logo);
-
-
-
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                    this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-            drawer.setDrawerListener(toggle);
-            toggle.syncState();
-
-            navigationView = (NavigationView) findViewById(R.id.nav_view);
-            navigationView.setNavigationItemSelectedListener(this);
+        listenerFunction(username);
+        if (id==1)
+        {
+            Recent recent = new Recent();
+            Bundle bundle = new Bundle();
+            bundle.putString("username", username);
+            bundle.putInt("id",id);
+            android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.fragment_container, recent);
+            recent.setArguments(bundle);
+            fragmentTransaction.commit();
+        }
+        else if(id==2)
+        {
+            NearByList nearByList = new NearByList();
+            Bundle bundle = new Bundle();
+            bundle.putString("username", username);
+            android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.fragment_container, nearByList);
+            nearByList.setArguments(bundle);
+            fragmentTransaction.commit();
+        }
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+         setSupportActionBar(toolbar);
+         getSupportActionBar().setDisplayShowTitleEnabled(false);
+         toolbar.setLogo(R.drawable.logo);
 
 
 
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
 
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
     }
 
     @Override
@@ -130,9 +121,9 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.homepage, menu);
-        MenuItem menuItem=menu.findItem(R.id.action_search);
+/*        MenuItem menuItem=menu.findItem(R.id.action_search);
         SearchView searchView= (SearchView) MenuItemCompat.getActionView(menuItem);
-        searchView.setOnQueryTextListener(this);
+        searchView.setOnQueryTextListener(this);*/
         return true;
     }
 
@@ -141,11 +132,19 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         switch (item.getItemId()){
             case R.id.action_location:
                 showEvents=new ShowEvents();
+                Log.e("Searching","action_location");
                 Intent intent=new Intent(this, ShowEvents.class);
                 intent.putExtra("username",username);
                 finish();
                 startActivity(intent);
+                break;
 
+            case R.id.action_search:
+                Log.e("Searching","action_search");
+                Intent searchintent=new Intent(this, SearchResultActivity.class);
+                searchintent.putExtra("username",username);
+                startActivity(searchintent);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -290,17 +289,6 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         return true;
     }
 
-    private boolean checkConnection(Context context) {
-        Log.e(STRING_TAG,"checkConnection");
-        boolean isConnected = ConnectivityReceiver.isConnected(context);
-        if(!isConnected){
-            Intent intent= new Intent(this,InternetConnection.class);
-            finish();
-            startActivity(intent);
-        }
-        return isConnected;
-    }
-
     public void trending(View view) {
         Button all = (Button) findViewById(R.id.button4);
         all.setBackgroundResource(R.drawable.cdefault);
@@ -383,6 +371,93 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         }
     }
 
+     public void retreiveFromDatabase(Context context){
+        Log.e(STRING_TAG,"database");
+        if(checkConnection(this)){
+            for (int i=0;i < userid.size();i++)
+            {
+                Log.i("Value of element "+i,fusername.get(i));
+                stat_forsearch_eventRecyclerView.initializeDataFollow(userid.get(i),fusername.get(i),useremail.get(i),context);
+                stat_forsearch_Useradapter = new EventRecyclerView.FollowItemAdapter(context, stat_forsearch_eventRecyclerView.getItemFollow());
+               /* mRecyclerView.setAdapter(staticadapter);*/
+            }
+        }
+
+    }
+
+    public void listenerFunction(String username){
+        Log.e(STRING_TAG,"insideListiner");
+        Response.Listener<String> responseListener= new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    Log.e(STRING_TAG,"try");
+                    JSONObject jsonObject=new JSONObject(response);
+                    JSONArray jsonArray = jsonObject.getJSONArray("userid");
+
+                    boolean success = jsonObject.getBoolean("success");
+                    if(success){
+                        Log.e(STRING_TAG,"insideSuccess");
+                        //JSONArray jsonArray = jsonObject.getJSONArray("userid");
+                        Log.e(STRING_TAG,"userid");
+                        JSONArray jsonArray2 = jsonObject.getJSONArray("username");
+                        Log.e(STRING_TAG,"username");
+                        JSONArray jsonArray3 = jsonObject.getJSONArray("email");
+                        Log.e(STRING_TAG,"email");
+
+                        if (jsonArray != null) {
+                            int len = jsonArray.length();
+                            Log.e(STRING_TAG,Integer.toString(len));
+
+                            //for userid
+                            for (int i=0;i<len;i++){
+                                userid.add(jsonArray.get(i).toString());
+                            }
+                            //for username
+                            for (int i=0;i<len;i++){
+                                fusername.add(jsonArray2.get(i).toString());
+                            }
+                            //for email
+                            for (int i=0;i<len;i++){
+                                useremail.add(jsonArray3.get(i).toString());
+                            }
+
+                            retreiveFromDatabase(HomePage.this);
+                        }
+                        else
+                            Log.e(STRING_TAG,"insideNull");
+
+                    }
+                    else {
+                        AlertDialog.Builder builder= new AlertDialog.Builder(HomePage.this);
+                        builder.setMessage("Connection Failed")
+                                .setNegativeButton("Retry",null)
+                                .create()
+                                .show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        if(checkConnection(this)){
+            RecyclerRequest recyclerRequest=new RecyclerRequest(username,"alluser", responseListener);
+            RequestQueue queue = Volley.newRequestQueue(this);
+            queue.add(recyclerRequest);
+        }
+    }
+
+    private boolean checkConnection(Context context) {
+        Log.e(STRING_TAG,"checkConnection");
+        boolean isConnected = ConnectivityReceiver.isConnected(context);
+        if(!isConnected){
+            Intent intent= new Intent(this,InternetConnection.class);
+            finish();
+            startActivity(intent);
+        }
+        return isConnected;
+    }
+
     @Override
     public void onNetworkConnectionChanged(boolean isConnected) {
         if(isConnected){
@@ -398,28 +473,4 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         }
     }
 
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String searchEvent) {
-        List<EventRecyclerView.Item> extractedItem=staticeventRecyclerView.getItem();
-        final List<EventRecyclerView.Item> searchItem=new ArrayList<>();
-        if(extractedItem.isEmpty())
-            Log.e(STRING_TAG,"empty");
-        else
-            Log.e(STRING_TAG,"is not empty");
-        for(EventRecyclerView.Item indevent: extractedItem){
-            String eventname=indevent.eventLabel;
-            Log.i(STRING_TAG+"Searching",searchEvent);
-            if(eventname.contains(searchEvent)){
-                searchItem.add(indevent);
-                Log.i(STRING_TAG+"SearchProgress",searchEvent);
-            }
-        }
-        staticadapter.setFilter(searchItem);
-        return true;
-    }
 }

@@ -9,9 +9,7 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.util.Base64;
 import android.util.Log;
-import android.util.LruCache;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,20 +33,22 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import semproject.nevent.Connection.ConnectivityReceiver;
+import semproject.nevent.Connection.InternetConnection;
+import semproject.nevent.Request.CountRequest;
+import semproject.nevent.Request.DeleteRequest;
 
 /**
  * Created by User on 12/26/2016.
@@ -59,6 +59,7 @@ public class EventRecyclerView {
     private final static String LOG_TAG = EventRecyclerView.class.getSimpleName();
     private final static String LOG_TAGS="Holder name down";
     private List<Item> items = new ArrayList<>();
+    private List<Item_follow> items_follow = new ArrayList<>();
 
     public EventRecyclerView() {
 
@@ -70,16 +71,27 @@ public class EventRecyclerView {
 
     }
 
+    public void initializeDataFollow(String followusername,String followid,String followemail, Context context) {
+        items_follow.add(new Item_follow(followusername,followid, followemail,context));
+        Log.e(STRING_TAG,followusername+" data initialized");
+
+    }
+
     public List getItem(){
         return items;
     }
+    public List getItemFollow(){return items_follow;}
 
+    public void emptyItems(){
+        items=Collections.emptyList();
+    }
+    public void emptyItemsFollow(){items_follow=Collections.emptyList();}
     public class Item {
         public String eventLabel;
-        private String eventId,eventLocation,eventDate,eventOrganizer,eventCategory;
-        private Context context;
-        private int viewcount;
-        private float distance;
+        public String eventId,eventLocation,eventDate,eventOrganizer,eventCategory;
+        public Context context;
+        public int viewcount;
+        public float distance;
 
         Item(String eventid,String eventname,String eventcategory,String eventlocation,String eventdate,String eventOrganizer,Integer count,Context context,float distance) {
             this.eventId=eventid;
@@ -92,6 +104,22 @@ public class EventRecyclerView {
             this.distance=distance;
             viewcount=count;
         }
+
+    }
+
+    public class Item_follow {
+        public String followusername;
+        public String followuserid;
+        public String followemail;
+        public Context context;
+
+        Item_follow(String followuserid,String followusername,String followemail, Context context) {
+            this.followuserid=followuserid;
+            this.followusername=followusername;
+            this.followemail= followemail;
+            this.context=context;
+        }
+
     }
 
     private static void listenerFunction(String eventname,Integer viewcount,final Context context){
@@ -700,6 +728,7 @@ public class EventRecyclerView {
             notifyDataSetChanged();
         }
 
+
         //For retrieving the image of event.
         private class Downloadimage extends AsyncTask<Void, Void, Bitmap>
         {
@@ -757,6 +786,185 @@ public class EventRecyclerView {
             }
         }
 
+    }
+
+    //For following user
+    public static class FollowItemAdapter extends RecyclerView.Adapter<FollowItemAdapter.FollowViewHolder> implements ConnectivityReceiver.ConnectivityReceiverListener{
+        String STRING_TAG= "FollowItemAdapter";
+
+        private static final String SERVER_ADDRESS="http://avashadhikari.com.np/";
+        String[] admin={"Aayush","Sagun","Pratyush","Avash","Prabin"};
+        /* private instance variable to store Layout of each item. */
+        private LayoutInflater inflater;
+        /* Store data */
+        List<Item_follow> items_follow= Collections.emptyList();
+        Item_follow currentItem;
+
+        @Override
+        public FollowViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            Log.v(LOG_TAG, "onCreateViewHolder called.");
+            View view = inflater.inflate(R.layout.follow_userprofile, parent, false);
+
+            FollowItemAdapter.FollowViewHolder holder = new FollowItemAdapter.FollowViewHolder(view);
+
+            return holder;
+        }
+
+        @Override
+        public void onBindViewHolder(final FollowViewHolder holder, int position) {
+            Log.v(LOG_TAG, "onBindViewHolder called.");
+            String defaultLabel="Activity";
+            String eventname;
+            currentItem = items_follow.get(position);
+
+            if(holder.followUsername.getText().equals(" "))
+                holder.followUsername.setText(defaultLabel);
+            else
+
+            if(currentItem.followusername.contains(" "))
+            {
+                eventname = currentItem.followusername.replaceAll(" ", "_");
+                holder.followUserpro.setTag(eventname);
+            }
+            else {
+                holder.followUserpro.setTag(currentItem.followusername);
+            }
+
+            holder.followUserpro.setVisibility(View.GONE);
+            new FollowItemAdapter.Downloadimage(holder, currentItem.followusername, position).execute();
+            holder.followUsername.setText(currentItem.followusername);
+            holder.followUserid.setText(currentItem.followuserid);
+            Log.v("Holder name up", holder.followUsername.getText().toString());
+
+            holder.followLinear.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(checkConnection()){
+                        //add another activity to follow the user
+                    }
+                }
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return items_follow.size();
+        }
+
+        public FollowItemAdapter(){
+           /* Log.e(STRING_TAG,Integer.toString(check));
+            check++;*/
+        }
+        // Constructor to inflate layout of each item in RecyclerView
+        public FollowItemAdapter(Context context, List<Item_follow> items) {
+            inflater = LayoutInflater.from(context);
+            this.items_follow = items;
+           /* Log.e(STRING_TAG,"itemadpter "+Integer.toString(check));*/
+
+        }
+
+        private boolean checkConnection() {
+            Log.e(STRING_TAG,"checkConnection");
+            boolean isConnected = ConnectivityReceiver.isConnected(currentItem.context);
+            if(!isConnected){
+                Intent intent= new Intent(currentItem.context,InternetConnection.class);
+                ((Activity)currentItem.context).finish();
+                currentItem.context.startActivity(intent);
+            }
+            return isConnected;
+        }
+
+        @Override
+        public void onNetworkConnectionChanged(boolean isConnected) {
+            if(isConnected){
+                Intent intent= new Intent(currentItem.context,MainActivity.class);
+                currentItem.context.startActivity(intent);
+                ((Activity)currentItem.context).finish();
+            }
+            else{
+                Intent intent= new Intent(currentItem.context,InternetConnection.class);
+                currentItem.context.startActivity(intent);
+                ((Activity)currentItem.context).finish();
+            }
+        }
+
+
+        class FollowViewHolder extends RecyclerView.ViewHolder {
+            LinearLayout followLinear;
+            TextView followUsername;
+            TextView followUserid;
+            ImageView followUserpro;
+
+            public FollowViewHolder(View itemView) {
+                super(itemView);
+                followLinear=(LinearLayout) itemView.findViewById(R.id.follow_layout);
+                followUserid=(TextView) itemView.findViewById(R.id.follow_id);
+                followUsername = (TextView) itemView.findViewById(R.id.follow_username);
+                followUserpro=(ImageView) itemView.findViewById(R.id.follow_profilepic);
+            }
+        }
+
+        public void setFilter(List<Item_follow> searchitem){
+            if(items_follow.isEmpty())
+                Log.e(STRING_TAG,"SetFilter empty");
+            //Log.e(STRING_TAG,"SetFilter "+Integer.toString(check));
+            items_follow=Collections.emptyList();
+            items_follow=searchitem;
+            notifyDataSetChanged();
+        }
+
+
+        //For retrieving the image of event.
+        private class Downloadimage extends AsyncTask<Void, Void, Bitmap> {
+            String name;
+            int position;
+            FollowItemAdapter.FollowViewHolder holder;
+
+            public Downloadimage(FollowItemAdapter.FollowViewHolder holder, String name, int position) {
+                this.position = position;
+                this.holder = holder;
+                this.name = name;
+            }
+
+            @Override
+            protected Bitmap doInBackground(Void... params) {
+                if (name.contains(" ")) {
+                    name = name.replaceAll(" ", "_");
+                }
+
+                String url = SERVER_ADDRESS + "pictures/userimages/" + name + ".JPG";
+
+                try {
+                    URLConnection connection = new URL(url).openConnection();
+                    connection.setConnectTimeout(1000 * 30);
+                    connection.setReadTimeout(1000 * 30);
+                    return BitmapFactory.decodeStream((InputStream) connection.getContent(), null, null);
+
+                } catch (Exception e) {
+
+                    return null;
+                }
+
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+                super.onPostExecute(bitmap);
+                Log.e("Holder set tag name _", holder.followUserpro.getTag().toString());
+                if (bitmap != null && holder.followUserpro.getTag().toString().equals(name)) {
+
+                    Log.v(LOG_TAGS, holder.followUsername.getText().toString());
+
+                    //holder.downloadedimage.getLayoutParams().height = 90;
+                    holder.followUserpro.setVisibility(View.VISIBLE);
+                    holder.followUserpro.setImageBitmap(bitmap);
+
+                } else {
+                    holder.followUserpro.setVisibility(View.GONE);
+                }
+
+            }
+        }
     }
 }
 

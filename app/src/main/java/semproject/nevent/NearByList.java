@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,23 +11,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.toolbox.Volley;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import semproject.nevent.Connection.ConnectivityReceiver;
+import semproject.nevent.Connection.InternetConnection;
+import semproject.nevent.EventRecyclerView;
+import semproject.nevent.MainActivity;
+import semproject.nevent.MapsActivities.ShowEvents;
+import semproject.nevent.R;
+
 import static semproject.nevent.HomePage.staticadapter;
 import static semproject.nevent.HomePage.staticeventRecyclerView;
-import static semproject.nevent.ShowEvents.distance;
-import static semproject.nevent.ShowEvents.la;
-import static semproject.nevent.ShowEvents.ln;
 
 import static semproject.nevent.Recent.extracteventCategory;
 import static semproject.nevent.Recent.extracteventDate;
@@ -97,7 +92,7 @@ public class NearByList extends Fragment implements ConnectivityReceiver.Connect
             for (int i=0;i < neareventList.size();i++)
             {
                 Log.i("CheckIndexRemove "+i," "+neareventList.get(i));
-                dist=distance.get(i)/1000;
+                dist= ShowEvents.distance.get(i)/1000;
                 DecimalFormat numberformat= new DecimalFormat("#.00");
                 dist=Float.parseFloat(numberformat.format(dist));
                 staticeventRecyclerView.initializeData(neareventId.get(i),neareventList.get(i),neareventCategory.get(i),neareventLocation.get(i),neareventDate.get(i),neareventOrganizer.get(i),nearviewcount.get(i),getContext(),dist);
@@ -121,7 +116,7 @@ public class NearByList extends Fragment implements ConnectivityReceiver.Connect
     public void listenerFunction(){
         Log.e(STRING_TAG,"insideListiner");
         int out=0;
-        for(double lat1: la){
+        for(double lat1: ShowEvents.la){
             int inside=0;
             if(extractlatitude.isEmpty())
                 Log.e("Insideextractby","Null");
@@ -129,7 +124,7 @@ public class NearByList extends Fragment implements ConnectivityReceiver.Connect
                 Log.e("InsideNearby","NOTNULL");
                 for(double lat2:extractlatitude){
                     Log.e("CheckIndex ",Double.toString(lat1)+" "+Double.toString(lat2));
-                    if((Double.compare(lat1,lat2)==0)&&(Double.compare(ln.get(out),extractlongitude.get(inside))==0)){
+                    if((Double.compare(lat1,lat2)==0)&&(Double.compare(ShowEvents.ln.get(out),extractlongitude.get(inside))==0)){
                         Log.e("InsideChck ",Integer.toString(inside)+" "+extracteventList.get(inside));
                         nearlatitude.add(extractlatitude.get(inside));
                         nearlongitude.add(extractlongitude.get(inside));

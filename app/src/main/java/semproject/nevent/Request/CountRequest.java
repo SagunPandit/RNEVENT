@@ -1,4 +1,4 @@
-package semproject.nevent;
+package semproject.nevent.Request;
 
 import android.util.Log;
 
@@ -9,22 +9,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by Aayush on 3/9/2017.
+ * Created by User on 1/23/2017.
  */
 
-public class AttendingEventRequest extends StringRequest {
-    final String STRING_TAG= "RecyclerRequest";
+public class CountRequest extends StringRequest {
+    final String STRING_TAG= "CountRequest";
     private static final String REGISTER_REQUEST_URL = "http://avashadhikari.com.np/Extract.php";
     private Map<String, String> params;//maps key to value dont have fixed size any number of values can be stored.
 
-    public AttendingEventRequest(String username, String eventId, Response.Listener<String> listener)
+    public CountRequest(String eventname,Integer viewcount, String check,Response.Listener<String> listener)
     {
         super(Method.POST, REGISTER_REQUEST_URL, listener, null);// post request or get request any one can be used to transfer data
-
+        Log.e(STRING_TAG,eventname);
+        Log.e(STRING_TAG,String.valueOf(viewcount));
         params = new HashMap<>();
-        params.put("username",username);
-        params.put("eventId",eventId);
-        params.put("check","attending");
+        params.put("username",eventname);
+        params.put("check",check);
+        params.put("viewcount",String.valueOf(viewcount));
 
     }
     @Override
@@ -33,3 +34,4 @@ public class AttendingEventRequest extends StringRequest {
     }
 
 }
+

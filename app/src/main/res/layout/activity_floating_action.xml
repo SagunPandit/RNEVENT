@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="semproject.nevent.NMapsActivity">
+    tools:context="semproject.nevent.MapsActivities.NMapsActivity">
 
 
     <android.support.design.widget.FloatingActionButton

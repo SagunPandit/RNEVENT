@@ -31,6 +31,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import semproject.nevent.Connection.ConnectivityReceiver;
+import semproject.nevent.Connection.InternetConnection;
+import semproject.nevent.Request.DeleteOutdatedRequest;
+import semproject.nevent.Request.RecyclerRequest;
+
+import static semproject.nevent.HomePage.stat_forsearch_eventRecyclerView;
 import static semproject.nevent.HomePage.staticadapter;
 import static semproject.nevent.HomePage.staticeventRecyclerView;
 
@@ -65,6 +71,7 @@ public class Recent extends Fragment implements ConnectivityReceiver.Connectivit
     public static List<Integer>extractviewcount=new ArrayList<>();
     public static List<Double>extractlatitude=new ArrayList<>();
     public static List<Double>extractlongitude=new ArrayList<>();
+    static EventRecyclerView.AllItemAdapter stat_forsearch_adapter=new EventRecyclerView.AllItemAdapter();
 
 
     public Recent() {
@@ -77,6 +84,9 @@ public class Recent extends Fragment implements ConnectivityReceiver.Connectivit
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        staticeventRecyclerView=new EventRecyclerView();
+        staticadapter=new EventRecyclerView.AllItemAdapter();
+        extractTime();
         username = getArguments().getString("username");
         latitude=new ArrayList<>();
         longitude=new ArrayList<>();
@@ -95,24 +105,27 @@ public class Recent extends Fragment implements ConnectivityReceiver.Connectivit
         // elements are laid out.
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
-        listenerFunction(username);
+        listenerFunction(username,getContext());
         return rootView;
     }
     public void retreiveFromDatabase(RecyclerView mRecyclerView,Context context){
         Log.e(STRING_TAG,"database");
-        if(checkConnection(getContext())){
+        if(checkConnection(context)){
             for (int i=0;i < eventList.size();i++)
             {
                 Log.i("Value of element "+i,eventList.get(i));
                 staticeventRecyclerView.initializeData(eventId.get(i),eventList.get(i),eventCategory.get(i),eventLocation.get(i),eventDate.get(i),eventOrganizer.get(i),viewcount.get(i),context,0);
+                stat_forsearch_eventRecyclerView.initializeData(eventId.get(i),eventList.get(i),eventCategory.get(i),eventLocation.get(i),eventDate.get(i),eventOrganizer.get(i),viewcount.get(i),context,0);
+
                 staticadapter = new EventRecyclerView.AllItemAdapter(context, staticeventRecyclerView.getItem(),username,false);
+                stat_forsearch_adapter = new EventRecyclerView.AllItemAdapter(context, staticeventRecyclerView.getItem(),username,false);
                 mRecyclerView.setAdapter(staticadapter);
             }
         }
 
     }
 
-    public void listenerFunction(String username){
+    public void listenerFunction(String username,final Context context){
         extracteventId=new ArrayList<>();
         extracteventList=new ArrayList<>();
         extracteventLocation=new ArrayList<>();
@@ -251,8 +264,8 @@ public class Recent extends Fragment implements ConnectivityReceiver.Connectivit
                                 }
                             }
 
-                            retreiveFromDatabase(mRecyclerView, getContext());
-                           new BackgroundDelete().execute();
+                            retreiveFromDatabase(mRecyclerView, context);
+                           new BackgroundDelete(context).execute();
                         }
                         else
                             Log.e(STRING_TAG,"insideNull");
@@ -270,7 +283,7 @@ public class Recent extends Fragment implements ConnectivityReceiver.Connectivit
                 }
             }
         };
-        if(checkConnection(getContext())){
+        if(checkConnection(context)){
             RecyclerRequest recyclerRequest=new RecyclerRequest(username,"all", responseListener);
             RequestQueue queue = Volley.newRequestQueue(getContext());
             queue.add(recyclerRequest);
@@ -396,6 +409,8 @@ public class Recent extends Fragment implements ConnectivityReceiver.Connectivit
 
 
     private class BackgroundDelete extends AsyncTask<Void, Void, Void> {
+        Context context;
+        public BackgroundDelete(Context context){ this.context=context;}
         @Override
         protected Void doInBackground(Void... params) {
             Log.e("DeleteOut", "insidedoinback");
@@ -407,7 +422,7 @@ public class Recent extends Fragment implements ConnectivityReceiver.Connectivit
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             String toastMesg = "App is up-to-date";
-            Toast toast = Toast.makeText(getContext(), toastMesg, Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(context, toastMesg, Toast.LENGTH_SHORT);
             TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
             if (v != null) v.setGravity(Gravity.CENTER);
             toast.show();

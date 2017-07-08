@@ -24,6 +24,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import semproject.nevent.Connection.ConnectivityReceiver;
+import semproject.nevent.Connection.InternetConnection;
+import semproject.nevent.Request.RecyclerRequest;
+
 import static semproject.nevent.HomePage.staticadapter;
 import static semproject.nevent.HomePage.staticeventRecyclerView;
 
@@ -31,7 +35,7 @@ import static semproject.nevent.HomePage.staticeventRecyclerView;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class Exhibition extends Fragment implements ConnectivityReceiver.ConnectivityReceiverListener{
+public class Exhibition extends Fragment implements ConnectivityReceiver.ConnectivityReceiverListener {
     private RecyclerView mRecyclerView;
     String STRING_TAG="EXHIBITION";
     String username;

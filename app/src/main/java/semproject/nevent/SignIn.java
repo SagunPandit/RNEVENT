@@ -23,6 +23,10 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import semproject.nevent.Connection.ConnectivityReceiver;
+import semproject.nevent.Connection.InternetConnection;
+import semproject.nevent.Request.LoginRequest;
+
 import static semproject.nevent.MainActivity.PreferenceFile;
 
 public class SignIn extends Activity implements ConnectivityReceiver.ConnectivityReceiverListener  {

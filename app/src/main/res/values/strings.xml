@@ -28,4 +28,5 @@
     <string name="title_activity_floating_action">FloatingAction</string>
     <string name="title_activity_show_events">Map</string>
     <string name="title_activity_show_location">Map</string>
+    <string name="title_activity_search_result">SearchResultActivity</string>
 </resources>

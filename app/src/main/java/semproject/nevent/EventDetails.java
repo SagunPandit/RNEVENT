@@ -13,7 +13,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,13 +20,19 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+
+import semproject.nevent.Connection.ConnectivityReceiver;
+import semproject.nevent.Connection.InternetConnection;
+import semproject.nevent.MapsActivities.ShowLocation;
+import semproject.nevent.Request.AttendingEventRequest;
+import semproject.nevent.Request.DetailRequest;
+import semproject.nevent.Request.ParticipantRequest;
 
 public class EventDetails extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener {
     String STRING_TAG="EventDetails";
@@ -172,6 +177,7 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
             queue.add(participantRequest);
         }
     }
+
     public void listenerFunction(){
         Log.e(STRING_TAG,"insideListiner");
         Response.Listener<String> responseListener= new Response.Listener<String>() {

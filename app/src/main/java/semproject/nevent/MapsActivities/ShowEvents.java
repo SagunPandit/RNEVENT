@@ -1,15 +1,17 @@
-package semproject.nevent;
+package semproject.nevent.MapsActivities;
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -17,6 +19,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -26,33 +30,50 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class ShowLocation extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+import java.util.ArrayList;
+import java.util.List;
+
+import semproject.nevent.HomePage;
+import semproject.nevent.R;
+
+import static semproject.nevent.Recent.extracteventList;
+import static semproject.nevent.Recent.extractlatitude;
+import static semproject.nevent.Recent.extractlongitude;
+import static semproject.nevent.Recent.latitude;
+import static semproject.nevent.Recent.longitude;
+
+public class ShowEvents extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private GoogleMap mMap;
     private GoogleApiClient client;
     private boolean mRequestingLocationUpdates = true;
     private LocationRequest mLocationRequest;
-    Location mLastLocation,mCurrentLocation;
+    static public List<Double> la=new ArrayList<>();
+    static public List<Double> ln=new ArrayList<>();
     String eventname;
-    Double latitude,longitude;
+    static public List<Float> distance=new ArrayList<>();
+
+/*    double[] la;
+    double[] ln;*/
+    /*float[] distance=null;*/
+    String username;
+    int id=2;
+
+    Location mLastLocation,mCurrentLocation;
+
+    public ShowEvents(){}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_show_location);
+        setContentView(R.layout.activity_show_events);
+        Intent intent = getIntent();
+        username = intent.getStringExtra("username");
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-        Intent intent = getIntent();
-        eventname=intent.getStringExtra("eventname");
-        latitude= Double.parseDouble(intent.getStringExtra("latitude"));
-        longitude=Double.parseDouble(intent.getStringExtra("longitude"));
-        Log.e("In show location",eventname);
-        Log.d("Latitude","Value"+latitude);
-        Log.d("Longitude","Value"+longitude);
-
+        /*ShowNearbyEvents();*/
     }
 
 
@@ -101,7 +122,6 @@ public class ShowLocation extends FragmentActivity implements OnMapReadyCallback
 
 
         }
-
         //lets imagine a function which shows all events
 
 
@@ -110,25 +130,162 @@ public class ShowLocation extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onInfoWindowClick(Marker marker) {
                 //TODO:add your desiredcode here and removve thetoast.
-                Toast.makeText(ShowLocation.this, eventname, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ShowEvents.this, marker.getTitle(), Toast.LENGTH_SHORT).show();
             }
         });
         //end of infowindow clicklistener
     }
 
-    //TO BE ADDED
-    //FUNCTION TO SHOW ALL EVENT
+    public void ShowNearbyEvents()
 
-    public void ShowEvent(double latitiude, double longitude, String EventName) {
+    {
+        mMap.moveCamera(CameraUpdateFactory
+                .newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), 9.0f));            ;
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(14.0f), 2000, null);
+        LatLng pos= new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+        Log.e("current",mCurrentLocation.toString());
+        Log.d("current long","value"+mCurrentLocation.getLatitude());
 
-        LatLng Mark = new LatLng(latitiude, longitude);
-        mMap.addMarker(new MarkerOptions().position(Mark).title(EventName));
 
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(Mark, (float) 14.0));
+        int i=0;
+
+        Double longs;
+
+
+
+        Circle circle = mMap.addCircle(new CircleOptions()
+                .center(pos)
+                .radius(5000)
+                .strokeColor(Color.rgb(0, 136, 255))
+                .fillColor(Color.argb(20, 0, 136, 255)));
+        la=new ArrayList<>();
+        ln=new ArrayList<>();
+        for (double lat:latitude) {
+
+            longs = longitude.get(i);
+
+
+            //mMap.addMarker(new MarkerOptions().position(Mark).title(EventName));
+            LatLng latlang = new LatLng(lat,longs);
+
+            float results[] = new float[1];
+
+            Location.distanceBetween(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude(),
+                    latlang.latitude, latlang.longitude,
+                    results);
+            if (results[0] < 5000)
+            {
+
+                    for(double lat2:extractlatitude)
+                    {
+
+                        if ((Double.compare(lat, lat2) == 0) && (Double.compare(longs, extractlongitude.get(i)) == 0))
+                        {
+
+                            eventname=extracteventList.get(i);
+                        }
+                    }
+                Log.d("current long","value"+latlang.latitude);
+                Log.e("inside","5 km");
+                mMap.addMarker(new MarkerOptions().position(latlang).title(eventname));
+
+
+                    la.add(lat);
+                    Log.e("Show",Double.toString(lat));
+                    ln.add(longs);
+
+
+                    distance.add(results[0]);
+
+            }
+            i++;
+        }
+
 
     }
 
+   /* public List<Double> getLa() {
+        Log.e("Getlatitude","inside");
+        if(la.isEmpty())
+            Log.e("Getlatitude","inside null");
 
+        return la;
+    }
+
+    public List<Float> getDistance() {
+        return distance;
+    }
+
+
+
+    public List<Double> getLn() {
+        for(double longs:ln){
+            Log.e("GetLongitude",Double.toString(longs));
+        }
+        return ln;
+    }*/
+
+
+/*    public void ShowNearbyEvents()
+    {
+        Circle circle = mMap.addCircle(new CircleOptions()
+                .center(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()))
+                .radius(10000)
+                .strokeColor(Color.RED)
+                .fillColor(Color.BLUE));
+        //ADD visible(false) later
+        //KEEP LOOP SO THAT DISTANCE BETWEEN ALL MARKERS ARE COMPUTED
+        float results[] = new float[1];
+
+        Location.distanceBetween(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude(),
+                latLongB.latitude, latLongB.longitude,
+                results);
+        if(results[0]<50000)
+
+        {
+            //make the markers visible otherwise invisible
+            *//*
+                             BACK UP PLAN
+
+
+
+
+          private List<Marker> markers = new ArrayList<>();
+
+// ...
+
+private void drawMap(LatLng latLng, List<LatLng> positions) {
+    for (LatLng position : positions) {
+        Marker marker = mMap.addMarker(
+                new MarkerOptions()
+                        .position(position)
+                        .visible(false)); // Invisible for now
+        markers.add(marker);
+    }
+
+    //Draw your circle
+    Circle circle = mMap.addCircle(new CircleOptions()
+            .center(latLng)
+            .radius(400)
+            .strokeColor(Color.rgb(0, 136, 255))
+            .fillColor(Color.argb(20, 0, 136, 255)));
+
+    for (Marker marker : markers) {
+        if (SphericalUtil.computeDistanceBetween(latLng, marker.getPosition()) < 400) {
+            marker.setVisible(true);
+        }
+    }
+}
+
+
+
+        *//*
+        }
+
+
+
+    }
+    */
 
     //CODE FOR SHOWING CURRENT LOCATION
     private void locateMyLocation() {
@@ -151,21 +308,20 @@ public class ShowLocation extends FragmentActivity implements OnMapReadyCallback
                         CameraUpdateFactory.newCameraPosition(myPosition));*/
 
                 //this conditon is removed in the onLocaitonChanged Method
-                if (cameraPosition.zoom < 7.0f) {
+             /*   if (cameraPosition.zoom < 7.0f) {
 
 
                     mMap.moveCamera(CameraUpdateFactory
-                            .newLatLngZoom(new LatLng(27.7172, 85.3240), 7.0f));
-                    mMap.animateCamera(CameraUpdateFactory.zoomTo(9.0f), 2000, null);
+                            .newLatLngZoom(new LatLng(27.7172, 85.3240), 14.0f));
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(12.0f), 2000, null);
 
-                }
+                }*/
 
 
             }
 
 
         });
-        ShowEvent(latitude,longitude,eventname);
     }
 
     //??
@@ -207,13 +363,15 @@ public class ShowLocation extends FragmentActivity implements OnMapReadyCallback
         if (mLastLocation != null) {
             Log.d("Location",mLastLocation.toString());
 
-        } else {
         }
 
         if (mRequestingLocationUpdates) {
             startLocationUpdates();
         }
+        ShowNearbyEvents();
+
     }
+
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -253,7 +411,19 @@ public class ShowLocation extends FragmentActivity implements OnMapReadyCallback
         }
         LocationServices.FusedLocationApi.requestLocationUpdates(
                 client, mLocationRequest, this);
-        Toast.makeText(this, eventname, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Request", Toast.LENGTH_SHORT).show();
+    }
+
+    public void nearbylistbutton(View view)
+    {
+        mMap.clear();
+        Intent intent= new Intent(this,HomePage.class);
+        intent.putExtra("id",id);
+        intent.putExtra("username",username);
+       /* intent.putExtra("latitude",la);
+        intent.putExtra("longitude",ln);
+        intent.putExtra("distance",distance);*/
+        finish();
+        startActivity(intent);
     }
 }
-
