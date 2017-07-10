@@ -14,7 +14,7 @@ import java.util.Map;
 public class UploadRequest extends StringRequest
 {
     final String STRING_TAG= "UploadRequest";
-    private static final String REGISTER_REQUEST_URL = "http://avashadhikari.com.np/Upload.php";
+    private static final String REGISTER_REQUEST_URL = "http://avsadh96.000webhostapp.com/Upload.php";
     private Map<String, String> params; //maps key to value dont have fixed size any number of values can be stored.
 
     public UploadRequest(String event_name,String location,String date,String category_name, String username,String details, Double latitude, Double longitude, Response.Listener<String> listener)

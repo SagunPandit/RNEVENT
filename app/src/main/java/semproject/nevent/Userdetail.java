@@ -48,7 +48,7 @@ import static semproject.nevent.MainActivity.PreferenceFile;
 
 public class Userdetail extends Fragment implements ConnectivityReceiver.ConnectivityReceiverListener {
     String STRING_TAG="Userdetail";
-    private static final String SERVER_ADDRESS="http://avashadhikari.com.np/";
+    private static final String SERVER_ADDRESS="http://avsadh96.000webhostapp.com/";
     ImageView downloadedimage;
     TextView user_name;
     SharedPreferences sharedpreferences;
@@ -60,7 +60,7 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
     List<String>eventCategory=new ArrayList<>();
     List<String>eventId=new ArrayList<>();
     List<Integer>viewcount=new ArrayList<>();
-    boolean display=true;
+    TextView denoteempty;
 
     public Userdetail(){}
 
@@ -71,6 +71,7 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
 
         View rootView = inflater.inflate(R.layout.fragment_userdetails, container, false);
         user_name=(TextView) rootView.findViewById(R.id.user_name);
+        denoteempty= (TextView) rootView.findViewById(R.id.empty_text);
         user_name.setText(username);
 
         downloadedimage=(ImageView) rootView.findViewById(R.id.profileimage);
@@ -145,9 +146,15 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
         EventRecyclerView eventRecyclerView = new EventRecyclerView();
         if(checkConnection(getContext())){
             if(ownEvents){
+                if (eventList.isEmpty()){
+                    eventRecyclerView.emptyItems();
+                    RecyclerView.Adapter mAdapter = new EventRecyclerView.ItemAdapter(getContext(), eventRecyclerView.getItem(),username);
+                    mRecyclerView.setAdapter(mAdapter);
+                    denoteempty.setVisibility(View.VISIBLE);
+                }
                 for (int i=0;i < eventList.size();i++)
                 {
-
+                    denoteempty.setVisibility(View.GONE);
                     Log.i("Value of element "+i,eventList.get(i));
                     eventRecyclerView.initializeData(eventId.get(i),eventList.get(i),eventCategory.get(i),eventLocation.get(i),eventDate.get(i),username,viewcount.get(i),getContext(),0);
                     RecyclerView.Adapter mAdapter = new EventRecyclerView.ItemAdapter(getContext(), eventRecyclerView.getItem(),username);
@@ -155,8 +162,15 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
                 }
             }
             else {
+                if (eventList.isEmpty()){
+                    eventRecyclerView.emptyItems();
+                    RecyclerView.Adapter mAdapter = new EventRecyclerView.AllItemAdapter(getContext(), eventRecyclerView.getItem(),username,false);
+                    mRecyclerView.setAdapter(mAdapter);
+                    denoteempty.setVisibility(View.VISIBLE);
+                }
                 for (int i=0;i < eventList.size();i++)
                 {
+                    denoteempty.setVisibility(View.GONE);
                     Log.i("Value of element "+i,eventList.get(i));
                     eventRecyclerView.initializeData(eventId.get(i),eventList.get(i),eventCategory.get(i),eventLocation.get(i),eventDate.get(i),username,viewcount.get(i),getContext(),0);
                     RecyclerView.Adapter mAdapter = new EventRecyclerView.AllItemAdapter(getContext(), eventRecyclerView.getItem(),username,false);
@@ -247,13 +261,13 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
         };
         if(checkConnection(getContext())){
             if(ownEvents)
-            {   Log.e(STRING_TAG+" lkasdkf",Boolean.toString(ownEvents));
+            {   Log.e(STRING_TAG+" own",Boolean.toString(ownEvents));
                 RecyclerRequest recyclerRequest=new RecyclerRequest(username,"own",responseListener);
                 RequestQueue queue = Volley.newRequestQueue(getContext());
                 queue.add(recyclerRequest);
             }
             else {
-                Log.e(STRING_TAG+" ajf;lkd",Boolean.toString(ownEvents));
+                Log.e(STRING_TAG+" going",Boolean.toString(ownEvents));
                 RecyclerRequest recyclerRequest=new RecyclerRequest(username,"getgoing",responseListener);
                 RequestQueue queue = Volley.newRequestQueue(getContext());
                 queue.add(recyclerRequest);
@@ -262,6 +276,8 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
         }
     }
     //For retrieving the image of user.
+
+
     private class Downloadimage extends AsyncTask<Void, Void, Bitmap>
     {
         String name;

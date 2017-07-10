@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -46,6 +47,7 @@ public class Sports extends Fragment implements ConnectivityReceiver.Connectivit
     List<String>eventCategory=new ArrayList<>();
     List<String>eventOrganizer=new ArrayList<>();
     List<Integer>viewcount=new ArrayList<>();
+    TextView denoteempty;
 
     public Sports() {
         // Required empty public constructor
@@ -59,6 +61,7 @@ public class Sports extends Fragment implements ConnectivityReceiver.Connectivit
                              Bundle savedInstanceState) {
         username = getArguments().getString("username");
         View rootView = inflater.inflate(R.layout.fragment_recent, container, false);
+        denoteempty= (TextView) rootView.findViewById(R.id.empty_text_allevents);
 
         // BEGIN_INCLUDE(initializeRecyclerView)
         RecyclerView.LayoutManager mLayoutManager;
@@ -79,8 +82,12 @@ public class Sports extends Fragment implements ConnectivityReceiver.Connectivit
     public void retreiveFromDatabase(RecyclerView mRecyclerView,Context context){
         Log.e(STRING_TAG,"database");
         if(checkConnection(getContext())){
+            if (eventList.isEmpty()){
+                denoteempty.setVisibility(View.VISIBLE);
+            }
             for (int i=0;i < eventList.size();i++)
             {
+                denoteempty.setVisibility(View.GONE);
                 Log.i("Value of element "+i,eventList.get(i));
                 staticeventRecyclerView.initializeData(eventId.get(i),eventList.get(i),eventCategory.get(i),eventLocation.get(i),eventDate.get(i),eventOrganizer.get(i),viewcount.get(i),context,0);
                 staticadapter = new EventRecyclerView.AllItemAdapter(context, staticeventRecyclerView.getItem(),username,false);

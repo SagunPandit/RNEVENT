@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class DeleteRequest extends StringRequest {
     final String STRING_TAG= "RecyclerRequest";
-    private static final String REGISTER_REQUEST_URL = "http://avashadhikari.com.np/Delete.php";
+    private static final String REGISTER_REQUEST_URL = "http://avsadh96.000webhostapp.com/Delete.php";
     private Map<String, String> params; //maps key to value dont have fixed size any number of values can be stored.
 
     public DeleteRequest(String username,String eventname,String eventdate,String eventcategory, String eventlocation, Response.Listener<String> listener)

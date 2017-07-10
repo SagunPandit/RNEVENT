@@ -47,7 +47,7 @@ public class SignUp extends AppCompatActivity implements ConnectivityReceiver.Co
     private static final int RESULT_LOAD_IMAGE=1;
     private static final int MAX_WIDTH=1024;
     private static final int SELECT_PICTURE = 1;
-    private static final String SERVER_ADDRESS="http://avashadhikari.com.np/";
+    private static final String SERVER_ADDRESS="http://avsadh96.000webhostapp.com/";
     TextView image;
     String encodedImage;
     ImageView imagetoupload;

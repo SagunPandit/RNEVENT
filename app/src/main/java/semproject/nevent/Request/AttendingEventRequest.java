@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class AttendingEventRequest extends StringRequest {
     final String STRING_TAG= "RecyclerRequest";
-    private static final String REGISTER_REQUEST_URL = "http://avashadhikari.com.np/Extract.php";
+    private static final String REGISTER_REQUEST_URL = "http://avsadh96.000webhostapp.com/Extract.php";
     private Map<String, String> params;//maps key to value dont have fixed size any number of values can be stored.
 
     public AttendingEventRequest(String username, String eventId, Response.Listener<String> listener)

@@ -157,7 +157,7 @@ public class EventRecyclerView {
         String STRING_TAG= "ItemAdapter";
         String eventnamedelete;
         String username;
-        private static final String SERVER_ADDRESS="http://avashadhikari.com.np/";
+        private static final String SERVER_ADDRESS="http://avsadh96.000webhostapp.com/";
         /* private instance variable to store Layout of each item. */
         private LayoutInflater inflater;
         /* Store data */
@@ -468,7 +468,7 @@ public class EventRecyclerView {
     public static class AllItemAdapter extends RecyclerView.Adapter<AllItemAdapter.AllItemViewHolder>implements ConnectivityReceiver.ConnectivityReceiverListener{
         String STRING_TAG= "ItemAdapter";
 
-        private static final String SERVER_ADDRESS="http://avashadhikari.com.np/";
+        private static final String SERVER_ADDRESS="http://avsadh96.000webhostapp.com/";
         String[] admin={"Aayush","Sagun","Pratyush","Avash","Prabin"};
         /* private instance variable to store Layout of each item. */
         private LayoutInflater inflater;
@@ -792,7 +792,7 @@ public class EventRecyclerView {
     public static class FollowItemAdapter extends RecyclerView.Adapter<FollowItemAdapter.FollowViewHolder> implements ConnectivityReceiver.ConnectivityReceiverListener{
         String STRING_TAG= "FollowItemAdapter";
 
-        private static final String SERVER_ADDRESS="http://avashadhikari.com.np/";
+        private static final String SERVER_ADDRESS="http://avsadh96.000webhostapp.com/";
         String[] admin={"Aayush","Sagun","Pratyush","Avash","Prabin"};
         /* private instance variable to store Layout of each item. */
         private LayoutInflater inflater;

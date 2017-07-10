@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class ParticipantRequest extends StringRequest {
     final String STRING_TAG= "RecyclerRequest";
-    private static final String REGISTER_REQUEST_URL = "http://avashadhikari.com.np/Attendingevent.php";
+    private static final String REGISTER_REQUEST_URL = "http://avsadh96.000webhostapp.com/Extract.php";
     private Map<String, String> params;//maps key to value dont have fixed size any number of values can be stored.
 
     public ParticipantRequest(String username, String eventid, Response.Listener<String> listener)

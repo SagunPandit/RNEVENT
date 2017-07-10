@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class DeleteOutdatedRequest extends StringRequest {
     final String STRING_TAG= "DeleteOutRequest";
-    private static final String REGISTER_REQUEST_URL = "http://avashadhikari.com.np/DeleteOut.php";
+    private static final String REGISTER_REQUEST_URL = "http://avsadh96.000webhostapp.com/DeleteOut.php";
     private Map<String, String> params; //maps key to value dont have fixed size any number of values can be stored.
 
     public DeleteOutdatedRequest(Integer id,Response.Listener<String> listener)

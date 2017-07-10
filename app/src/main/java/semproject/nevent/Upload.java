@@ -66,7 +66,7 @@ public class Upload extends AppCompatActivity implements ConnectivityReceiver.Co
     private static final int MAX_WIDTH=1080;
     String encodedImage;
     double longitude, latitude;
-    private static final String SERVER_ADDRESS="http://avashadhikari.com.np/";
+    private static final String SERVER_ADDRESS="http://avsadh96.000webhostapp.com/";
     LatLng latlang = null;
     TextView image;
     EditText event_name, location, details;

@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class RegisterRequest extends StringRequest{
     final String STRING_TAG= "RegisterRequest";
-    private static final String REGISTER_REQUEST_URL = "http://avashadhikari.com.np/Register.php";
+    private static final String REGISTER_REQUEST_URL = "http://avsadh96.000webhostapp.com/Register.php";
     private Map<String, String> params; //maps key to value dont have fixed size any number of values can be stored.
 
     public RegisterRequest(String username, String email, String password, Response.Listener<String> listener) {

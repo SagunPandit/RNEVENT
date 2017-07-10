@@ -36,7 +36,7 @@ import semproject.nevent.Request.ParticipantRequest;
 
 public class EventDetails extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener {
     String STRING_TAG="EventDetails";
-    private static final String SERVER_ADDRESS="http://avashadhikari.com.np/";
+    private static final String SERVER_ADDRESS="http://avsadh96.000webhostapp.com/";
     ImageView downloadedimage;
     TextView veventLabel,veventLocation,veventDate,veventOrganizer,veventCategory,veventId,veventDetails,attendingtext, participantnumber;
     Button attendingbutton;
@@ -96,6 +96,7 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
 
     public void attendingevents(View view)
     {
+        Log.e(STRING_TAG,"going button pressed");
         attendingbutton.setVisibility(View.GONE);
         attendingtext.setVisibility(View.GONE);
         Response.Listener<String> responselistener= new Response.Listener<String>()
@@ -104,13 +105,12 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
             public void onResponse(String response)
             {
                 try {
-
                     JSONObject jsonObject=new JSONObject(response);
                     boolean success = jsonObject.getBoolean("success");
                     String number= Integer.toString(jsonObject.getInt("participants"));
                     if(success){
                         participantnumber.setText(number);
-                        Log.e(STRING_TAG,"insideSuccess");
+                        Log.e(STRING_TAG,"after btn insideSuccess");
                         String toastMesg = "See you there.";
                         Toast toast = Toast.makeText(getApplicationContext(), toastMesg, Toast.LENGTH_SHORT);
                         TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
@@ -145,11 +145,12 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
             public void onResponse(String response)
             {
                 try {
-
+                    Log.e(STRING_TAG,"insideCheckGoing");
                     JSONObject jsonObject=new JSONObject(response);
                     boolean success = jsonObject.getBoolean("success");
                     boolean going= jsonObject.getBoolean("going");
                     String number= Integer.toString(jsonObject.getInt("participants"));
+                    Log.e(STRING_TAG,"insideCheckGoing"+number);
                     if(success){
                         if(going){
                             attendingbutton.setVisibility(View.GONE);
@@ -272,6 +273,7 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
             super.onPostExecute(bitmap);
             if(bitmap!=null)
             {
+                Log.e(STRING_TAG,"Image downloaded");
                 downloadedimage.setImageBitmap(bitmap);
             }
         }
