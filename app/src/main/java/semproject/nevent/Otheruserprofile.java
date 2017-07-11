@@ -64,7 +64,7 @@ public class Otheruserprofile extends AppCompatActivity implements ConnectivityR
         following=(TextView) findViewById(R.id.following);
         user_name.setText(otherusername);
         followbutton=(Button) findViewById(R.id.followbutton);
-        downloadedimage=(ImageView)findViewById(R.id.profileimage);
+        downloadedimage=(ImageView) findViewById(R.id.otheruserprofilepicture);
         new Downloadimage(otherusername).execute();
 
         // For checking if the user is already followed.

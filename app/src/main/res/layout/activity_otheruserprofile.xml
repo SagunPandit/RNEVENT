@@ -24,7 +24,7 @@
                 android:layout_weight="1.5">
 
                 <ImageView
-                    android:id="@+id/otheruserprofileimage"
+                    android:id="@+id/otheruserprofilepicture"
                     android:layout_width="150sp"
                     android:layout_height="150sp"
                     android:layout_centerInParent="true"
