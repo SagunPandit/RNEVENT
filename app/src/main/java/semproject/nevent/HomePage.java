@@ -54,6 +54,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
 
@@ -289,6 +290,22 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         return true;
     }
 
+    public void feed(View view)
+    {
+        Button feeds = (Button) findViewById(R.id.button6);
+        feeds.setBackgroundResource(R.drawable.shape3);
+        if(checkConnection(this))
+        {
+            Bundle bundle = new Bundle();
+            bundle.putString("username", username);
+            Feed feed=new Feed();
+            android.support.v4.app.FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.fragment_container, feed);
+            feed.setArguments(bundle);
+            fragmentTransaction.commit();
+        }
+    }
+
     public void trending(View view) {
         Button all = (Button) findViewById(R.id.button4);
         all.setBackgroundResource(R.drawable.cdefault);
@@ -338,14 +355,23 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             finish();
             startActivity(i);
         }
+    }
 
-
+    public void check(View view)
+    {
+        if(checkConnection(this)){
+            Bundle bundle = new Bundle();
+            bundle.putString("otherusername", "Sagun");
+            bundle.putString("username", username);
+            Otherusersprofile userDetail=new Otherusersprofile();
+            android.support.v4.app.FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.fragment_container, userDetail);
+            userDetail.setArguments(bundle);
+            fragmentTransaction.commit();
+        }
     }
 
     public void userdetails(View view){
-
-
-
         Button all = (Button) findViewById(R.id.button4);
         all.setBackgroundResource(R.drawable.cdefault);
 

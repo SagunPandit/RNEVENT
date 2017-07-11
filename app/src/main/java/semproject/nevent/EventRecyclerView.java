@@ -841,7 +841,10 @@ public class EventRecyclerView {
                 @Override
                 public void onClick(View v) {
                     if(checkConnection()){
-                        //add another activity to follow the user
+                        Intent i=new Intent(currentItem.context, Otheruserprofile.class);
+                        i.putExtra("username",username);
+                        i.putExtra("otherusername",holder.followUsername.getText().toString());
+                        currentItem.context.startActivity(i);
                         Log.e(STRING_TAG,username);
                     }
                 }

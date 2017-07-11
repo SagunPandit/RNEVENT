@@ -37,6 +37,17 @@
         android:background="@drawable/shape3"
         android:onClick="recent"/>
 
+        <Button
+            android:text="Feed"
+            android:textColor="@android:color/background_light"
+            android:layout_width="0sp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:id="@+id/button6"
+            android:layout_below="@+id/toolbar"
+            android:background="@android:color/background_dark"
+            android:onClick="feed"/>
+
 
     <Button
         android:text="Trending"
@@ -68,6 +79,12 @@
         android:layout_height="match_parent"
         android:layout_marginTop="0dp"
         android:layout_below="@+id/buttons">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="check"
+            android:text="Check"/>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fabButton"

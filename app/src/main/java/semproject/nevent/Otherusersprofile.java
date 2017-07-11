@@ -2,7 +2,6 @@ package semproject.nevent;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -35,50 +34,85 @@ import java.util.List;
 
 import semproject.nevent.Connection.ConnectivityReceiver;
 import semproject.nevent.Connection.InternetConnection;
-import semproject.nevent.EventRecyclerView;
-import semproject.nevent.MainActivity;
-import semproject.nevent.R;
+import semproject.nevent.Request.FollowRequest;
 import semproject.nevent.Request.RecyclerRequest;
+import semproject.nevent.Request.TryforotheruserRequest;
 
-import static semproject.nevent.MainActivity.PreferenceFile;
+public class Otherusersprofile extends Fragment implements ConnectivityReceiver.ConnectivityReceiverListener {
 
-/**
- * Created by User on 1/29/2017.
- */
-
-public class Userdetail extends Fragment implements ConnectivityReceiver.ConnectivityReceiverListener {
-    String STRING_TAG="Userdetail";
-    private static final String SERVER_ADDRESS="http://avsadh96.000webhostapp.com/";
-    ImageView downloadedimage;
-    TextView user_name;
-    SharedPreferences sharedpreferences;
+    String STRING_TAG="OtherUserdetail";
     private RecyclerView mRecyclerView;
-    String username;
+    private static final String SERVER_ADDRESS="http://avsadh96.000webhostapp.com";
+    ImageView downloadedimage;
     List<String> eventList=new ArrayList<>();
     List<String>eventLocation=new ArrayList<>();
     List<String>eventDate=new ArrayList<>();
     List<String>eventCategory=new ArrayList<>();
     List<String>eventId=new ArrayList<>();
     List<Integer>viewcount=new ArrayList<>();
-    TextView denoteempty;
+    TextView user_name, followers, following;
+    Button followbutton;
+    String username;
+    String otherusername;
 
-    public Userdetail(){}
+    public Otherusersprofile() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        username = getArguments().getString("username");
+        otherusername = getArguments().getString("otherusername");
+        username=getArguments().getString("username");
 
-        View rootView = inflater.inflate(R.layout.fragment_userdetails, container, false);
-        user_name=(TextView) rootView.findViewById(R.id.user_name);
-        denoteempty= (TextView) rootView.findViewById(R.id.empty_text);
-        user_name.setText(username);
-
+        View rootView = inflater.inflate(R.layout.fragment_otherusersprofile, container, false);
+        user_name=(TextView) rootView.findViewById(R.id.otherusername);
+        followers=(TextView) rootView.findViewById(R.id.followers);
+        following=(TextView) rootView.findViewById(R.id.following);
+        user_name.setText(otherusername);
+        followbutton=(Button) rootView.findViewById(R.id.followbutton);
         downloadedimage=(ImageView) rootView.findViewById(R.id.profileimage);
-        new Downloadimage(username).execute();
+        new Downloadimage(otherusername).execute();
+
+        // For checking if the user is already followed.
+        Response.Listener<String> responselistener= new Response.Listener<String>()
+        {
+            @Override
+            public void onResponse(String response)
+            {
+                try {
+
+                    JSONObject jsonObject=new JSONObject(response);
+                    boolean success = jsonObject.getBoolean("success");
+                    boolean alreadyfollowing= jsonObject.getBoolean("alreadyfollowing");
+                    String countfollow= Integer.toString(jsonObject.getInt("countfollow"));
+                    String countfollowers= Integer.toString(jsonObject.getInt("countfollowers"));
+                    if(success)
+                    {
+                        if(alreadyfollowing)
+                        {
+                            followbutton.setVisibility(View.GONE);
+                        }
+
+                        following.setText(countfollow+ "\nFollowing");
+                        Log.e("countfollow",countfollow);
+                        Log.e("Followers",countfollowers);
+                        followers.setText(countfollowers+ "\nFollowers");
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        };
+        if(checkConnection(getContext())){
+            FollowRequest followRequest=new FollowRequest(username, otherusername , "followcheck", responselistener);
+            RequestQueue queue = Volley.newRequestQueue(getContext());
+            queue.add(followRequest);
+        }
+
         // BEGIN_INCLUDE(initializeRecyclerView)
         RecyclerView.LayoutManager mLayoutManager;
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.user_recycler_view);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.otheruser_recycler_view);
         if (mRecyclerView != null) {
             mRecyclerView.setHasFixedSize(true);
         }
@@ -90,55 +124,78 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        final Button userevents=(Button) rootView.findViewById(R.id.userevents);
-        userevents.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(checkConnection(getContext())){
-                    userListener(true);
-                }
-                /*if(display){
+
+        followbutton.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    followbutton.setVisibility(View.GONE);
+                    Response.Listener<String> responselistener= new Response.Listener<String>()
+                    {
+                        @Override
+                        public void onResponse(String response)
+                        {
+                            try {
+
+                                JSONObject jsonObject=new JSONObject(response);
+                                boolean success = jsonObject.getBoolean("success");
+                                if(success){
+                                    Log.e(STRING_TAG,"Successfully followed");
+
+                                }
+                                else {
+                                    AlertDialog.Builder builder= new AlertDialog.Builder(getContext());
+                                    builder.setMessage("Connection Failed")
+                                            .setNegativeButton("Retry",null)
+                                            .create()
+                                            .show();
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    };
                     if(checkConnection(getContext())){
-                        userListener(true);
+                        FollowRequest followRequest=new FollowRequest(username, otherusername , "followbutton", responselistener);
+                        RequestQueue queue = Volley.newRequestQueue(getContext());
+                        queue.add(followRequest);
                     }
-*//*                    userevents.setVisibility(View.GONE);
-                    userevents.setEnabled(true);*//*
-                    display=false;
-                }*/
-
-            }
-        });
-
-        Button goingevents=(Button) rootView.findViewById(R.id.goingevents);
-        goingevents.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(checkConnection(getContext())){
-/*                    userevents.setVisibility(View.VISIBLE);*/
-                    userListener(false);
                 }
             }
-        });
-        Button userlogout=(Button) rootView.findViewById(R.id.userlogout);
-        userlogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(checkConnection(getContext())){
-                    sharedpreferences = getActivity().getSharedPreferences(PreferenceFile, Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedpreferences.edit();
-                    editor.clear();
-                    editor.apply();
-                    Intent intent= new Intent(getContext(),MainActivity.class);
-                    getActivity().finish();
-                    startActivity(intent);
-                }
-            }
-        });
+        );
 
+        userListener(true);
         return rootView;
     }
 
 
+    private boolean checkConnection(Context context) {
+        Log.e(STRING_TAG,"checkConnection");
+        boolean isConnected = ConnectivityReceiver.isConnected(context);
+        if(!isConnected){
+            Intent intent= new Intent(getContext(),InternetConnection.class);
+            getActivity().finish();
+            startActivity(intent);
+        }
+        return isConnected;
+    }
+
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        if(isConnected){
+            Intent intent= new Intent(getContext(),MainActivity.class);
+            getActivity().finish();
+            startActivity(intent);
+        }
+        else{
+            Intent intent= new Intent(getContext(),InternetConnection.class);
+            getActivity().finish();
+            startActivity(intent);
+
+        }
+    }
 
     public void retreiveFromDatabase(boolean ownEvents){
         Log.e(STRING_TAG,"database");
@@ -146,34 +203,21 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
         EventRecyclerView eventRecyclerView = new EventRecyclerView();
         if(checkConnection(getContext())){
             if(ownEvents){
-                if (eventList.isEmpty()){
-                    eventRecyclerView.emptyItems();
-                    RecyclerView.Adapter mAdapter = new EventRecyclerView.ItemAdapter(getContext(), eventRecyclerView.getItem(),username);
-                    mRecyclerView.setAdapter(mAdapter);
-                    denoteempty.setVisibility(View.VISIBLE);
-                }
                 for (int i=0;i < eventList.size();i++)
                 {
-                    denoteempty.setVisibility(View.GONE);
+
                     Log.i("Value of element "+i,eventList.get(i));
-                    eventRecyclerView.initializeData(eventId.get(i),eventList.get(i),eventCategory.get(i),eventLocation.get(i),eventDate.get(i),username,viewcount.get(i),getContext(),0);
-                    RecyclerView.Adapter mAdapter = new EventRecyclerView.ItemAdapter(getContext(), eventRecyclerView.getItem(),username);
+                    eventRecyclerView.initializeData(eventId.get(i),eventList.get(i),eventCategory.get(i),eventLocation.get(i),eventDate.get(i),otherusername,viewcount.get(i),getContext(),0);
+                    RecyclerView.Adapter mAdapter = new EventRecyclerView.ItemAdapter(getContext(), eventRecyclerView.getItem(),otherusername);
                     mRecyclerView.setAdapter(mAdapter);
                 }
             }
             else {
-                if (eventList.isEmpty()){
-                    eventRecyclerView.emptyItems();
-                    RecyclerView.Adapter mAdapter = new EventRecyclerView.AllItemAdapter(getContext(), eventRecyclerView.getItem(),username,false);
-                    mRecyclerView.setAdapter(mAdapter);
-                    denoteempty.setVisibility(View.VISIBLE);
-                }
                 for (int i=0;i < eventList.size();i++)
                 {
-                    denoteempty.setVisibility(View.GONE);
                     Log.i("Value of element "+i,eventList.get(i));
-                    eventRecyclerView.initializeData(eventId.get(i),eventList.get(i),eventCategory.get(i),eventLocation.get(i),eventDate.get(i),username,viewcount.get(i),getContext(),0);
-                    RecyclerView.Adapter mAdapter = new EventRecyclerView.AllItemAdapter(getContext(), eventRecyclerView.getItem(),username,false);
+                    eventRecyclerView.initializeData(eventId.get(i),eventList.get(i),eventCategory.get(i),eventLocation.get(i),eventDate.get(i),otherusername,viewcount.get(i),getContext(),0);
+                    RecyclerView.Adapter mAdapter = new EventRecyclerView.AllItemAdapter(getContext(), eventRecyclerView.getItem(),otherusername,false);
                     mRecyclerView.setAdapter(mAdapter);
                 }
             }
@@ -181,6 +225,7 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
         }
 
     }
+
 
     public void userListener(final boolean ownEvents){
         Log.e(STRING_TAG,"insideListiner");
@@ -196,7 +241,7 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
                 try {
                     Log.e(STRING_TAG,"try");
                     JSONObject jsonObject=new JSONObject(response);
-                    boolean success = jsonObject.getBoolean("success1");
+                    boolean success = jsonObject.getBoolean("success");
                     Log.v("Success", Boolean.toString(success));
                     if(success){
                         Log.e(STRING_TAG,"insideSuccess");
@@ -262,23 +307,26 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
         };
         if(checkConnection(getContext())){
             if(ownEvents)
-            {   Log.e(STRING_TAG+" own",Boolean.toString(ownEvents));
-                RecyclerRequest recyclerRequest=new RecyclerRequest(username,"own",responseListener);
+            {   Log.e(STRING_TAG+" lkasdkf",Boolean.toString(ownEvents));
+                Log.e("Listener otherusername", otherusername);
+                /*RecyclerRequest recyclerRequest=new RecyclerRequest(otherusername,"own",responseListener);
+                RequestQueue queue = Volley.newRequestQueue(getContext());
+                queue.add(recyclerRequest);*/
+                TryforotheruserRequest recyclerRequest=new TryforotheruserRequest(otherusername,responseListener);
                 RequestQueue queue = Volley.newRequestQueue(getContext());
                 queue.add(recyclerRequest);
             }
             else {
-                Log.e(STRING_TAG+" going",Boolean.toString(ownEvents));
-                RecyclerRequest recyclerRequest=new RecyclerRequest(username,"getgoing",responseListener);
+                Log.e(STRING_TAG+" ajf;lkd",Boolean.toString(ownEvents));
+                RecyclerRequest recyclerRequest=new RecyclerRequest(otherusername,"getgoing",responseListener);
                 RequestQueue queue = Volley.newRequestQueue(getContext());
                 queue.add(recyclerRequest);
             }
 
         }
     }
+
     //For retrieving the image of user.
-
-
     private class Downloadimage extends AsyncTask<Void, Void, Bitmap>
     {
         String name;
@@ -309,34 +357,6 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
             {
                 downloadedimage.setImageBitmap(bitmap);
             }
-        }
-    }
-
-
-
-    private boolean checkConnection(Context context) {
-        Log.e(STRING_TAG,"checkConnection");
-        boolean isConnected = ConnectivityReceiver.isConnected(context);
-        if(!isConnected){
-            Intent intent= new Intent(getContext(),InternetConnection.class);
-            getActivity().finish();
-            startActivity(intent);
-        }
-        return isConnected;
-    }
-
-    @Override
-    public void onNetworkConnectionChanged(boolean isConnected) {
-        if(isConnected){
-            Intent intent= new Intent(getContext(),MainActivity.class);
-            getActivity().finish();
-            startActivity(intent);
-        }
-        else{
-            Intent intent= new Intent(getContext(),InternetConnection.class);
-            getActivity().finish();
-            startActivity(intent);
-
         }
     }
 }
