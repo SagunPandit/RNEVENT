@@ -54,7 +54,7 @@ public class SearchResultActivity extends AppCompatActivity implements Connectiv
     final String STRING_TAG= "SearchResultActivity";
     static EventRecyclerView staticeventRecyclerView = new EventRecyclerView();
     static EventRecyclerView.AllItemAdapter staticadapter=new EventRecyclerView.AllItemAdapter();
-    String username;
+    static String searchusername;
     List<String>userid=new ArrayList<>();
     List<String>fusername=new ArrayList<>();
     List<String>useremail=new ArrayList<>();
@@ -79,7 +79,7 @@ public class SearchResultActivity extends AppCompatActivity implements Connectiv
         tabLayout.setupWithViewPager(mViewPager);
 
         Intent intent = getIntent();
-        username = intent.getStringExtra("username");
+        searchusername = intent.getStringExtra("username");
         //listenerFunction(username);
     }
 
@@ -104,7 +104,7 @@ public class SearchResultActivity extends AppCompatActivity implements Connectiv
                 // Create a simple intent that starts the hierarchical parent activity and
                 // use NavUtils in the Support Package to ensure proper handling of Up.
                 Intent upIntent = new Intent(this,HomePage.class);
-                upIntent.putExtra("username",username);
+                upIntent.putExtra("username",searchusername);
                 upIntent.putExtra("id",1);
                 if (NavUtils.shouldUpRecreateTask(this, upIntent)) {
                     // This activity is not part of the application's task, so create a new task

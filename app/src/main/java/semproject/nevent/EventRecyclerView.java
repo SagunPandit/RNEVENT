@@ -799,6 +799,7 @@ public class EventRecyclerView {
         /* Store data */
         List<Item_follow> items_follow= Collections.emptyList();
         Item_follow currentItem;
+        String username;
 
         @Override
         public FollowViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -841,6 +842,7 @@ public class EventRecyclerView {
                 public void onClick(View v) {
                     if(checkConnection()){
                         //add another activity to follow the user
+                        Log.e(STRING_TAG,username);
                     }
                 }
             });
@@ -856,9 +858,10 @@ public class EventRecyclerView {
             check++;*/
         }
         // Constructor to inflate layout of each item in RecyclerView
-        public FollowItemAdapter(Context context, List<Item_follow> items) {
+        public FollowItemAdapter(Context context, List<Item_follow> items, String username) {
             inflater = LayoutInflater.from(context);
             this.items_follow = items;
+            this.username=username;
            /* Log.e(STRING_TAG,"itemadpter "+Integer.toString(check));*/
 
         }

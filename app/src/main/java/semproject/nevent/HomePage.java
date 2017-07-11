@@ -378,7 +378,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             {
                 Log.i("Value of element "+i,fusername.get(i));
                 stat_forsearch_eventRecyclerView.initializeDataFollow(userid.get(i),fusername.get(i),useremail.get(i),context);
-                stat_forsearch_Useradapter = new EventRecyclerView.FollowItemAdapter(context, stat_forsearch_eventRecyclerView.getItemFollow());
+                stat_forsearch_Useradapter = new EventRecyclerView.FollowItemAdapter(context, stat_forsearch_eventRecyclerView.getItemFollow(),username);
                /* mRecyclerView.setAdapter(staticadapter);*/
             }
         }

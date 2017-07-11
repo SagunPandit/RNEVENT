@@ -14,6 +14,7 @@ import java.util.List;
 
 import static semproject.nevent.HomePage.stat_forsearch_eventRecyclerView;
 import static semproject.nevent.Recent.stat_forsearch_adapter;
+import static semproject.nevent.SearchResultActivity.searchusername;
 
 
 /**
@@ -120,14 +121,14 @@ public class Tab1Event extends Fragment {
         }
         if(searchItem.isEmpty()) {
             tab2recyclerview.emptyItemsFollow();
-            searchadapter = new EventRecyclerView.FollowItemAdapter(getContext().getApplicationContext(), tab2recyclerview.getItemFollow());
+            searchadapter = new EventRecyclerView.FollowItemAdapter(getContext().getApplicationContext(), tab2recyclerview.getItemFollow(),searchusername);
             Tab2User.tab2mRecyclerView.setAdapter(searchadapter);
             Log.i("tab1Searched", "SearchItem is empty");
         }else {
             for (EventRecyclerView.Item_follow indevent : searchItem) {
                 Log.i("tab1Searched Userfl", indevent.followusername);
                 tab2recyclerview.initializeDataFollow(indevent.followuserid,indevent.followusername,indevent.followemail,getContext());
-                searchadapter = new EventRecyclerView.FollowItemAdapter(indevent.context.getApplicationContext(), tab2recyclerview.getItemFollow());
+                searchadapter = new EventRecyclerView.FollowItemAdapter(indevent.context.getApplicationContext(), tab2recyclerview.getItemFollow(),searchusername);
                 Tab2User.tab2mRecyclerView.setAdapter(searchadapter);
                 Log.i("tab1Searched User", indevent.followusername);
             }
