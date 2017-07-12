@@ -319,6 +319,9 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         Button trend = (Button) findViewById(R.id.button5);
         trend.setBackgroundResource(R.drawable.cdefault);
 
+        Button all = (Button) findViewById(R.id.button4);
+        all.setBackgroundResource(R.drawable.cdefault);
+
         Button feeds = (Button) findViewById(R.id.button6);
         feeds.setBackgroundResource(R.drawable.shape3);
         if(checkConnection(this))
