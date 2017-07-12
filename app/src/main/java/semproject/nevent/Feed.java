@@ -95,8 +95,8 @@ public class Feed extends Fragment implements ConnectivityReceiver.ConnectivityR
                     Log.e(STRING_TAG,"try");
                     JSONObject jsonObject=new JSONObject(response);
                     boolean success = jsonObject.getBoolean("success");
-                    String fromwhere= jsonObject.getString("where");
-                    Log.e("WHERE",fromwhere);
+                    //String fromwhere= jsonObject.getString("where");
+                    //Log.e("WHERE",fromwhere);
                     if(success){
                         Log.e(STRING_TAG,"insideSuccess");
                         JSONArray jsonArray = jsonObject.getJSONArray("event_name");

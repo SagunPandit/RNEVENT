@@ -160,6 +160,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
 
         Button trend = (Button) findViewById(R.id.button5);
 
+        Button feeds = (Button) findViewById(R.id.button6);
+
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         Bundle bundle = new Bundle();
@@ -169,6 +171,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             trend.setBackgroundResource(R.drawable.cdefault);
             all.setBackgroundResource(R.drawable.cdefault);
             user.setBackgroundResource(R.drawable.cdefault);
+            feeds.setBackgroundResource(R.drawable.cdefault);
 
 
             Sports sports=new Sports();
@@ -182,6 +185,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             trend.setBackgroundResource(R.drawable.cdefault);
             all.setBackgroundResource(R.drawable.cdefault);
             user.setBackgroundResource(R.drawable.cdefault);
+            feeds.setBackgroundResource(R.drawable.cdefault);
+
             Parties parties=new Parties();
             android.support.v4.app.FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_container, parties);
@@ -193,6 +198,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             trend.setBackgroundResource(R.drawable.cdefault);
             all.setBackgroundResource(R.drawable.cdefault);
             user.setBackgroundResource(R.drawable.cdefault);
+            feeds.setBackgroundResource(R.drawable.cdefault);
+
             Conference conference=new Conference();
             android.support.v4.app.FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_container, conference);
@@ -204,6 +211,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             trend.setBackgroundResource(R.drawable.cdefault);
             all.setBackgroundResource(R.drawable.cdefault);
             user.setBackgroundResource(R.drawable.cdefault);
+            feeds.setBackgroundResource(R.drawable.cdefault);
+
             Donations donations=new Donations();
             android.support.v4.app.FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_container, donations);
@@ -217,6 +226,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             trend.setBackgroundResource(R.drawable.cdefault);
             all.setBackgroundResource(R.drawable.cdefault);
             user.setBackgroundResource(R.drawable.cdefault);
+            feeds.setBackgroundResource(R.drawable.cdefault);
+
             Others others=new Others();
             android.support.v4.app.FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_container, others);
@@ -229,6 +240,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             trend.setBackgroundResource(R.drawable.cdefault);
             all.setBackgroundResource(R.drawable.cdefault);
             user.setBackgroundResource(R.drawable.cdefault);
+            feeds.setBackgroundResource(R.drawable.cdefault);
+
             Business business=new Business();
             android.support.v4.app.FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_container, business);
@@ -241,6 +254,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             trend.setBackgroundResource(R.drawable.cdefault);
             all.setBackgroundResource(R.drawable.cdefault);
             user.setBackgroundResource(R.drawable.cdefault);
+            feeds.setBackgroundResource(R.drawable.cdefault);
+
             Concert concert=new Concert();
             android.support.v4.app.FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_container, concert);
@@ -254,6 +269,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             trend.setBackgroundResource(R.drawable.cdefault);
             all.setBackgroundResource(R.drawable.cdefault);
             user.setBackgroundResource(R.drawable.cdefault);
+            feeds.setBackgroundResource(R.drawable.cdefault);
+
             Educational educational=new Educational();
             android.support.v4.app.FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_container, educational);
@@ -266,6 +283,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             trend.setBackgroundResource(R.drawable.cdefault);
             all.setBackgroundResource(R.drawable.cdefault);
             user.setBackgroundResource(R.drawable.cdefault);
+            feeds.setBackgroundResource(R.drawable.cdefault);
+
             Exhibition exhibition=new Exhibition();
             android.support.v4.app.FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_container, exhibition);
@@ -278,6 +297,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             trend.setBackgroundResource(R.drawable.cdefault);
             all.setBackgroundResource(R.drawable.cdefault);
             user.setBackgroundResource(R.drawable.cdefault);
+            feeds.setBackgroundResource(R.drawable.cdefault);
+
             Gaming gaming=new Gaming();
             android.support.v4.app.FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_container, gaming);
@@ -292,6 +313,12 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
 
     public void feed(View view)
     {
+        Button user = (Button) findViewById(R.id.user_button);
+        user.setBackgroundResource(R.drawable.cdefault);
+
+        Button trend = (Button) findViewById(R.id.button5);
+        trend.setBackgroundResource(R.drawable.cdefault);
+
         Button feeds = (Button) findViewById(R.id.button6);
         feeds.setBackgroundResource(R.drawable.shape3);
         if(checkConnection(this))
@@ -313,6 +340,9 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         Button user = (Button) findViewById(R.id.user_button);
         user.setBackgroundResource(R.drawable.cdefault);
 
+        Button feeds = (Button) findViewById(R.id.button6);
+        feeds.setBackgroundResource(R.drawable.cdefault);
+
         Button trend = (Button) findViewById(R.id.button5);
         trend.setBackgroundResource(R.drawable.shape3);
         if(checkConnection(this)){
@@ -333,6 +363,9 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
 
         Button trend = (Button) findViewById(R.id.button5);
         trend.setBackgroundResource(R.drawable.cdefault);
+
+        Button feeds = (Button) findViewById(R.id.button6);
+        feeds.setBackgroundResource(R.drawable.cdefault);
 
 
         Button all = (Button) findViewById(R.id.button4);
@@ -357,7 +390,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         }
     }
 
-    public void check(View view)
+   /* public void check(View view)
     {
         if(checkConnection(this)){
             Bundle bundle = new Bundle();
@@ -369,7 +402,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             userDetail.setArguments(bundle);
             fragmentTransaction.commit();
         }
-    }
+    }*/
 
     public void userdetails(View view){
         Button all = (Button) findViewById(R.id.button4);

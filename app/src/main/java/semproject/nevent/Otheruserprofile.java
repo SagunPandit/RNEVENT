@@ -11,10 +11,12 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -39,7 +41,7 @@ import semproject.nevent.Request.TryforotheruserRequest;
 public class Otheruserprofile extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener {
     String STRING_TAG="OtherUserdetail";
     private RecyclerView mRecyclerView;
-    private static final String SERVER_ADDRESS="http://avsadh96.000webhostapp.com";
+    private static final String SERVER_ADDRESS="http://avsadh96.000webhostapp.com/";
     ImageView downloadedimage;
     List<String> eventList=new ArrayList<>();
     List<String>eventLocation=new ArrayList<>();
@@ -135,8 +137,15 @@ public class Otheruserprofile extends AppCompatActivity implements ConnectivityR
 
                                                             JSONObject jsonObject=new JSONObject(response);
                                                             boolean success = jsonObject.getBoolean("success");
+                                                            String countfollowers= Integer.toString(jsonObject.getInt("countfollowers"));
                                                             if(success){
                                                                 Log.e(STRING_TAG,"Successfully followed");
+                                                                followers.setText(countfollowers+ "\nFollowers");
+                                                                String toastMesg = "You are now following "+ otherusername;
+                                                                Toast toast = Toast.makeText(Otheruserprofile.this, toastMesg, Toast.LENGTH_SHORT);
+                                                                TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
+                                                                if (v != null) v.setGravity(Gravity.CENTER);
+                                                                toast.show();
 
                                                             }
                                                             else {
