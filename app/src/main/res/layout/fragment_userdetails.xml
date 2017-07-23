@@ -85,6 +85,9 @@
                 android:text="Logout"
                 android:gravity="center"
                 android:background="@drawable/shape4"/>
+
+
+
         </LinearLayout>
         <TextView
             android:id="@+id/empty_text"
@@ -96,6 +99,15 @@
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
             android:visibility="gone"/>
+
+        <com.facebook.login.widget.LoginButton
+            android:id="@+id/login_button2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="130dp"
+            android:layout_marginBottom="100dp" />
+
         <android.support.v7.widget.RecyclerView
             android:layout_marginTop="20dp"
             android:layout_width="match_parent"

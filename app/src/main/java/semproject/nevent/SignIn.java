@@ -20,6 +20,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
 
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -35,10 +36,16 @@ public class SignIn extends Activity implements ConnectivityReceiver.Connectivit
     EditText username;
     EditText password;
     int id=1;
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_sign_in);
+
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -54,6 +61,8 @@ public class SignIn extends Activity implements ConnectivityReceiver.Connectivit
             return;
         }
     }
+
+
 
     public void register(View view){
         Intent i= new Intent(this, SignUp.class);

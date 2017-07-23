@@ -22,6 +22,12 @@ import android.widget.TextView;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,6 +46,7 @@ import semproject.nevent.MainActivity;
 import semproject.nevent.R;
 import semproject.nevent.Request.RecyclerRequest;
 
+import static com.facebook.FacebookSdk.getApplicationContext;
 import static semproject.nevent.MainActivity.PreferenceFile;
 
 /**
@@ -64,9 +71,19 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
 
     public Userdetail(){}
 
+    private LoginButton loginButton;
+    private CallbackManager callbackManager;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        callbackManager= CallbackManager.Factory.create();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        FacebookSdk.sdkInitialize(getActivity());
         username = getArguments().getString("username");
 
         View rootView = inflater.inflate(R.layout.fragment_userdetails, container, false);
@@ -76,6 +93,34 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
 
         downloadedimage=(ImageView) rootView.findViewById(R.id.profileimage);
         new Downloadimage(username).execute();
+
+        loginButton=(LoginButton)rootView.findViewById((R.id.login_button2));
+
+        loginButton.setReadPermissions("email");
+        // If using in a fragment
+        loginButton.setFragment(this);
+
+        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Log.e("Success","Your process has success");
+
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                /*info.setText("Login attempt failed.");*/
+                Log.e("Error","Your process has error");
+
+            }
+        });
+
+
         // BEGIN_INCLUDE(initializeRecyclerView)
         RecyclerView.LayoutManager mLayoutManager;
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.user_recycler_view);
@@ -138,6 +183,11 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
         return rootView;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
 
 
     public void retreiveFromDatabase(boolean ownEvents){

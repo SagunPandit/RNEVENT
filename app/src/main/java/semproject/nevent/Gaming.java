@@ -51,10 +51,10 @@ public class Gaming extends Fragment implements ConnectivityReceiver.Connectivit
 
     public Gaming() {
         // Required empty public constructor
-        staticeventRecyclerView=new EventRecyclerView();
-        staticadapter=new EventRecyclerView.AllItemAdapter();
-    }
+        staticeventRecyclerView = new EventRecyclerView();
+        staticadapter = new EventRecyclerView.AllItemAdapter();
 
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

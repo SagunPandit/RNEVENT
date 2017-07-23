@@ -13,14 +13,15 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
+
     <application
-        android:name="android.support.multidex.MultiDexApplication"
         android:allowBackup="true"
         android:icon="@mipmap/logo"
         android:label="@string/app_name"
-        android:largeHeap="true"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        android:largeHeap="true"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+        android:name="android.support.multidex.MultiDexApplication">
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait">
@@ -43,8 +44,8 @@
             android:label="nEVENT"
             android:screenOrientation="portrait">
             <meta-data
-                android:name="android.app.default_searchable"
-                android:value=".SearchResultActivity" />
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
         </activity>
         <activity
             android:name=".SignIn"
@@ -52,7 +53,7 @@
         <activity
             android:name=".Upload"
             android:screenOrientation="portrait" />
-        <activity android:name=".Connection.InternetConnection" />
+        <activity android:name=".InternetConnection" />
         <activity
             android:name=".EventDetails"
             android:screenOrientation="portrait" />
@@ -70,9 +71,9 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".MapsActivities.NMapsActivity"
+            android:name=".NMapsActivity"
             android:parentActivityName=".Upload"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"></activity>
         <!--
      ATTENTION: This was auto-generated to add Google Play services to your project for
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -82,29 +83,15 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".MapsActivities.ShowEvents"
+            android:name=".ShowEvents"
             android:label="@string/title_activity_show_events"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"></activity>
         <activity
-            android:name=".MapsActivities.ShowLocation"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".SearchResultActivity"
-            android:label="@string/title_activity_search_result"
-            android:parentActivityName=".HomePage"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="semproject.nevent.HomePage" />
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable" />
+            android:name=".ShowLocation"
+            android:screenOrientation="portrait"></activity>
 
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".Otheruserprofile"></activity>
+        <meta-data android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id"/>
     </application>
 
 </manifest>

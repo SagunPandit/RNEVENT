@@ -24,6 +24,8 @@
         android:layout_centerHorizontal="true" />
 
 
+
+
     <TextView
         android:text="All your events simplified!"
         android:layout_width="wrap_content"
