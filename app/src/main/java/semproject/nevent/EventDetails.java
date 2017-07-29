@@ -16,6 +16,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -54,7 +55,7 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
     Button attendingbutton;
     String eventId, eventLabel, eventLocation, eventDate, eventOrganizer, eventCategory,eventDetails,eventLatitude, eventLongitude, username;
     Friendinvite friendinvite;
-    public static RecyclerView mRecyclerView;
+    static public RecyclerView mRecyclerView;
     //public RecyclerView.Adapter mAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,16 +87,17 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
         new Downloadimage(eventLabel).execute();
         setvalues();
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.invite_recycler_view);
-        if (mRecyclerView != null) {
-            mRecyclerView.setHasFixedSize(true);
-        }
-
-
         // LinearLayoutManager is used here, this will layout the elements in a similar fashion
         // to the way ListView would layout elements. The RecyclerView.LayoutManager defines how
         // elements are laid out.
-
+        /*mRecyclerView = (RecyclerView) findViewById(R.id.invite_recycler_view);
+        if (mRecyclerView != null) {
+            mRecyclerView.setHasFixedSize(true);
+        }
+        RecyclerView.LayoutManager mLayoutManager;
+        mLayoutManager = new LinearLayoutManager(this.getApplication());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+*/
 
     }
 
@@ -273,10 +275,9 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
 
 
     public static class Friendinvite extends DialogFragment {
-        RecyclerView.LayoutManager mLayoutManager;
+        RecyclerView mRecyclerView;
         public Friendinvite()
         {
-
         }
         @NonNull
         @Override
@@ -284,7 +285,6 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
             // Use the Builder class for convenient dialog construction
             final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle("Friend List")
-                    .setView(R.layout.custom_dialog_box)
                     .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             Log.e("DialogBox","Inside dialog box");
@@ -294,7 +294,15 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
                         public void onClick(DialogInterface dialog, int id) {// User cancelled the dialog
                         }
                     });
-            mLayoutManager = new LinearLayoutManager(getActivity());
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            View view = inflater.inflate(R.layout.custom_dialog_box, null);
+            builder.setView(view);
+            mRecyclerView = (RecyclerView) view.findViewById(R.id.invite_recycler_view);
+            if (mRecyclerView != null) {
+                mRecyclerView.setHasFixedSize(true);
+            }
+            RecyclerView.LayoutManager mLayoutManager;
+            mLayoutManager = new LinearLayoutManager(getContext());
             mRecyclerView.setLayoutManager(mLayoutManager);
             mRecyclerView.setAdapter(stat_forsearch_Useradapter);
             // Create the AlertDialog object and return it
@@ -302,6 +310,7 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
 
 
         }
+
     }
     //For retrieving the image of event.
     private class Downloadimage extends AsyncTask<Void, Void, Bitmap>
