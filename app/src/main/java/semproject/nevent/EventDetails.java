@@ -1,17 +1,24 @@
 package semproject.nevent;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,9 +30,11 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.List;
 
 import semproject.nevent.Connection.ConnectivityReceiver;
 import semproject.nevent.Connection.InternetConnection;
@@ -34,6 +43,9 @@ import semproject.nevent.Request.AttendingEventRequest;
 import semproject.nevent.Request.DetailRequest;
 import semproject.nevent.Request.ParticipantRequest;
 
+import static semproject.nevent.HomePage.stat_forsearch_Useradapter;
+import static semproject.nevent.HomePage.stat_forsearch_eventRecyclerView;
+
 public class EventDetails extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener {
     String STRING_TAG="EventDetails";
     private static final String SERVER_ADDRESS="http://avsadh96.000webhostapp.com/";
@@ -41,6 +53,9 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
     TextView veventLabel,veventLocation,veventDate,veventOrganizer,veventCategory,veventId,veventDetails,attendingtext, participantnumber;
     Button attendingbutton;
     String eventId, eventLabel, eventLocation, eventDate, eventOrganizer, eventCategory,eventDetails,eventLatitude, eventLongitude, username;
+    Friendinvite friendinvite;
+    public static RecyclerView mRecyclerView;
+    //public RecyclerView.Adapter mAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +85,17 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
         downloadedimage=(ImageView) findViewById(R.id.detaildownloadedimage);
         new Downloadimage(eventLabel).execute();
         setvalues();
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.invite_recycler_view);
+        if (mRecyclerView != null) {
+            mRecyclerView.setHasFixedSize(true);
+        }
+
+
+        // LinearLayoutManager is used here, this will layout the elements in a similar fashion
+        // to the way ListView would layout elements. The RecyclerView.LayoutManager defines how
+        // elements are laid out.
+
 
     }
 
@@ -239,7 +265,44 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
         }
     }
 
+    public void invite(View view)
+    {
+        friendinvite = new Friendinvite();
+        friendinvite.show(getSupportFragmentManager(), "details");
+    }
 
+
+    public static class Friendinvite extends DialogFragment {
+        RecyclerView.LayoutManager mLayoutManager;
+        public Friendinvite()
+        {
+
+        }
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the Builder class for convenient dialog construction
+            final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Friend List")
+                    .setView(R.layout.custom_dialog_box)
+                    .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            Log.e("DialogBox","Inside dialog box");
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {// User cancelled the dialog
+                        }
+                    });
+            mLayoutManager = new LinearLayoutManager(getActivity());
+            mRecyclerView.setLayoutManager(mLayoutManager);
+            mRecyclerView.setAdapter(stat_forsearch_Useradapter);
+            // Create the AlertDialog object and return it
+            return builder.create();
+
+
+        }
+    }
     //For retrieving the image of event.
     private class Downloadimage extends AsyncTask<Void, Void, Bitmap>
     {
@@ -279,3 +342,4 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
         }
     }
 }
+
