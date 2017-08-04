@@ -121,14 +121,14 @@ public class Tab1Event extends Fragment {
         }
         if(searchItem.isEmpty()) {
             tab2recyclerview.emptyItemsFollow();
-            searchadapter = new EventRecyclerView.FollowItemAdapter(getContext().getApplicationContext(), tab2recyclerview.getItemFollow(),searchusername);
+            searchadapter = new EventRecyclerView.FollowItemAdapter(getContext().getApplicationContext(), tab2recyclerview.getItemFollow(),searchusername,false);
             Tab2User.tab2mRecyclerView.setAdapter(searchadapter);
             Log.i("tab1Searched", "SearchItem is empty");
         }else {
             for (EventRecyclerView.Item_follow indevent : searchItem) {
                 Log.i("tab1Searched Userfl", indevent.followusername);
                 tab2recyclerview.initializeDataFollow(indevent.followuserid,indevent.followusername,indevent.followemail,getContext());
-                searchadapter = new EventRecyclerView.FollowItemAdapter(indevent.context.getApplicationContext(), tab2recyclerview.getItemFollow(),searchusername);
+                searchadapter = new EventRecyclerView.FollowItemAdapter(indevent.context.getApplicationContext(), tab2recyclerview.getItemFollow(),searchusername,false);
                 Tab2User.tab2mRecyclerView.setAdapter(searchadapter);
                 Log.i("tab1Searched User", indevent.followusername);
             }
