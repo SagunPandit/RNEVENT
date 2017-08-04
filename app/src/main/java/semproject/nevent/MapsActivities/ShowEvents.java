@@ -10,10 +10,19 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookSdk;
+import com.facebook.internal.BoltsMeasurementEventListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -33,14 +42,21 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.ArrayList;
 import java.util.List;
 
+import semproject.nevent.EventRecyclerView;
 import semproject.nevent.HomePage;
 import semproject.nevent.R;
+
+import static semproject.nevent.HomePage.staticadapter;
+import static semproject.nevent.HomePage.staticeventRecyclerView;
 
 import static semproject.nevent.Recent.extracteventList;
 import static semproject.nevent.Recent.extractlatitude;
 import static semproject.nevent.Recent.extractlongitude;
 import static semproject.nevent.Recent.latitude;
 import static semproject.nevent.Recent.longitude;
+import static semproject.nevent.Userdetail.fbeventList;
+import static semproject.nevent.Userdetail.fblatitude;
+import static semproject.nevent.Userdetail.fblongitude;
 
 public class ShowEvents extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
@@ -50,8 +66,16 @@ public class ShowEvents extends FragmentActivity implements OnMapReadyCallback, 
     private LocationRequest mLocationRequest;
     static public List<Double> la=new ArrayList<>();
     static public List<Double> ln=new ArrayList<>();
+    static public List<Double> fbla=new ArrayList<>();
+    static public List<Double> fbln=new ArrayList<>();
     String eventname;
     static public List<Float> distance=new ArrayList<>();
+    static public List<Float> fbdistance=new ArrayList<>();
+    List<Marker> markerArray=new ArrayList<>();
+    Button nearBybutton;
+    private CallbackManager callbackManager;
+    AccessTokenTracker accessTokenTracker;
+    static public Boolean isFbpresent=false;
 
 /*    double[] la;
     double[] ln;*/
@@ -61,18 +85,35 @@ public class ShowEvents extends FragmentActivity implements OnMapReadyCallback, 
 
     Location mLastLocation,mCurrentLocation;
 
-    public ShowEvents(){}
+    public ShowEvents(){
+        staticeventRecyclerView=new EventRecyclerView();
+        staticadapter=new EventRecyclerView.AllItemAdapter();
+        la.clear();
+        ln.clear();
+        fbla.clear();
+        fbln.clear();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        callbackManager = CallbackManager.Factory.create();
+        FacebookSdk.sdkInitialize(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_events);
         Intent intent = getIntent();
+        nearBybutton=(Button) findViewById(R.id.nearbylist);
         username = intent.getStringExtra("username");
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        accessTokenTracker = new AccessTokenTracker() {
+            @Override
+            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken newAccessToken) {
+                updateWithToken(newAccessToken);
+            }
+        };
         /*ShowNearbyEvents();*/
     }
 
@@ -136,72 +177,91 @@ public class ShowEvents extends FragmentActivity implements OnMapReadyCallback, 
         //end of infowindow clicklistener
     }
 
-    public void ShowNearbyEvents()
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
 
+    }
+
+    private void updateWithToken(AccessToken currentAccessToken) {
+        if(currentAccessToken!=null){
+            isFbpresent=true;
+            ShowNearbyEvents(true);
+            Log.e("Facebook","Loggedin");
+        }
+        else{
+            Log.e("Facebook","NearBy event not found");
+        }
+    }
+
+
+    public void ShowNearbyEvents(Boolean isFbpresent)
     {
+        if(isFbpresent){
+            mainWork(fblatitude,fblongitude,fblatitude,fblongitude,fbeventList,isFbpresent);
+        }else{
+            mainWork(latitude,longitude,extractlatitude,extractlongitude,extracteventList,isFbpresent);
+        }
+
+    }
+
+    public void mainWork(List<Double> latitude,List<Double> longitude,List<Double> extractlatitude,List<Double> extractlongitude,List<String> extracteventList,Boolean isFbpresent){
         mMap.moveCamera(CameraUpdateFactory
                 .newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), 9.0f));            ;
         mMap.animateCamera(CameraUpdateFactory.zoomTo(14.0f), 2000, null);
         LatLng pos= new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-        Log.e("current",mCurrentLocation.toString());
+        Log.d("current",mCurrentLocation.toString());
         Log.d("current long","value"+mCurrentLocation.getLatitude());
-
-
-        int i=0;
-
-        Double longs;
-
-
 
         Circle circle = mMap.addCircle(new CircleOptions()
                 .center(pos)
                 .radius(5000)
                 .strokeColor(Color.rgb(0, 136, 255))
                 .fillColor(Color.argb(20, 0, 136, 255)));
-        la=new ArrayList<>();
-        ln=new ArrayList<>();
+        int i=0;
+        Double longs;
+
         for (double lat:latitude) {
-
             longs = longitude.get(i);
-
-
             //mMap.addMarker(new MarkerOptions().position(Mark).title(EventName));
             LatLng latlang = new LatLng(lat,longs);
-
             float results[] = new float[1];
-
             Location.distanceBetween(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude(),
                     latlang.latitude, latlang.longitude,
                     results);
             if (results[0] < 5000)
             {
+                for(double lat2:extractlatitude)
+                {
 
-                    for(double lat2:extractlatitude)
+                    if ((Double.compare(lat, lat2) == 0) && (Double.compare(longs, extractlongitude.get(i)) == 0))
                     {
 
-                        if ((Double.compare(lat, lat2) == 0) && (Double.compare(longs, extractlongitude.get(i)) == 0))
-                        {
-
-                            eventname=extracteventList.get(i);
-                        }
+                        eventname=extracteventList.get(i);
                     }
-                Log.d("current long","value"+latlang.latitude);
-                Log.e("inside","5 km");
-                mMap.addMarker(new MarkerOptions().position(latlang).title(eventname));
-
-
-                    la.add(lat);
-                    Log.e("Show",Double.toString(lat));
+                }
+                Log.e("MapNear",eventname);
+                Log.e("MapNear","value"+latlang.latitude);
+                Log.e("MapNear","5 km");
+                //markerArray.add(mMap.addMarker(new MarkerOptions().position(latlang).title(eventname)));
+                Marker marker=mMap.addMarker(new MarkerOptions().position(latlang).title(eventname));
+                markerArray.add(marker);
+                if(isFbpresent){
+                    if(fbla.add(lat))
+                        Log.e("MapNear",Double.toString(lat));
+                    fbln.add(longs);
+                    fbdistance.add(results[0]);
+                }else{
+                    if(la.add(lat))
+                        Log.e("MapNear",Double.toString(lat));
                     ln.add(longs);
-
-
                     distance.add(results[0]);
+                }
 
             }
             i++;
-        }
-
-
+        }Log.e("MapNear","end.............");
     }
 
    /* public List<Double> getLa() {
@@ -345,7 +405,6 @@ private void drawMap(LatLng latLng, List<LatLng> positions) {
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -368,7 +427,8 @@ private void drawMap(LatLng latLng, List<LatLng> positions) {
         if (mRequestingLocationUpdates) {
             startLocationUpdates();
         }
-        ShowNearbyEvents();
+        ShowNearbyEvents(false);
+        updateWithToken(AccessToken.getCurrentAccessToken());
 
     }
 
@@ -416,14 +476,26 @@ private void drawMap(LatLng latLng, List<LatLng> positions) {
 
     public void nearbylistbutton(View view)
     {
+        staticeventRecyclerView=new EventRecyclerView();
+        staticadapter=new EventRecyclerView.AllItemAdapter();
         mMap.clear();
-        Intent intent= new Intent(this,HomePage.class);
-        intent.putExtra("id",id);
-        intent.putExtra("username",username);
-       /* intent.putExtra("latitude",la);
-        intent.putExtra("longitude",ln);
-        intent.putExtra("distance",distance);*/
-        finish();
-        startActivity(intent);
+        if(markerArray.isEmpty()){
+            String toastMesg = "No events to show";
+            Toast toast = Toast.makeText(view.getContext(), toastMesg, Toast.LENGTH_SHORT);
+            TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
+            if (v != null) v.setGravity(Gravity.CENTER);
+            toast.show();
+        }
+        else{
+            Intent intent= new Intent(this,HomePage.class);
+            intent.putExtra("id",id);
+            intent.putExtra("username",username);
+           /* intent.putExtra("latitude",la);
+            intent.putExtra("longitude",ln);
+            intent.putExtra("distance",distance);*/
+            finish();
+            startActivity(intent);
+        }
+
     }
 }

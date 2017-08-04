@@ -1,5 +1,6 @@
 package semproject.nevent;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,6 +20,9 @@ import android.widget.Button;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
+import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
+import com.facebook.FacebookSdk;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,22 +43,29 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
     String username;
     Context context;
     int id;
-    static EventRecyclerView staticeventRecyclerView = new EventRecyclerView();
+    static public EventRecyclerView staticeventRecyclerView = new EventRecyclerView();
     static EventRecyclerView stat_forsearch_eventRecyclerView = new EventRecyclerView();
+    static EventRecyclerView stat_forinvite_eventRecyclerView = new EventRecyclerView();
 
-    static EventRecyclerView.AllItemAdapter staticadapter=new EventRecyclerView.AllItemAdapter();
+    static public EventRecyclerView.AllItemAdapter staticadapter=new EventRecyclerView.AllItemAdapter();
     static EventRecyclerView.FollowItemAdapter stat_forsearch_Useradapter=new EventRecyclerView.FollowItemAdapter();
+    //static EventRecyclerView.FollowItemAdapter stat_forinvite_Useradapter=new EventRecyclerView.FollowItemAdapter();
 
-    static ShowEvents showEvents;
 
-    List<String>userid=new ArrayList<>();
-    List<String>fusername=new ArrayList<>();
-    List<String>useremail=new ArrayList<>();
+    List<String>search_userid=new ArrayList<>();
+    List<String>search_username=new ArrayList<>();
+    List<String>search_useremail=new ArrayList<>();
+
+    List<String>invite_userid=new ArrayList<>();
+    List<String>invite_username=new ArrayList<>();
+    List<String>invite_useremail=new ArrayList<>();
+
+    AccessTokenTracker accessTokenTracker;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
+        FacebookSdk.sdkInitialize(this.getApplicationContext());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
 
@@ -68,8 +79,16 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         id=intent.getIntExtra("id",3);
         Button userbutton=(Button)findViewById(R.id.user_button);
         userbutton.setText(username);
+        accessTokenTracker = new AccessTokenTracker() {
+            @Override
+            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken newAccessToken) {
+                updateWithToken(newAccessToken);
+            }
+        };
+        updateWithToken(AccessToken.getCurrentAccessToken());
 
-        listenerFunction(username);
+        listenerFunction(username,search_userid,search_username,search_useremail,true);
+        listenerFunction(username,invite_userid,invite_username,invite_useremail,false);
         if (id==1)
         {
             Recent recent = new Recent();
@@ -91,7 +110,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             nearByList.setArguments(bundle);
             fragmentTransaction.commit();
         }
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+         toolbar = (Toolbar) findViewById(R.id.toolbar);
          setSupportActionBar(toolbar);
          getSupportActionBar().setDisplayShowTitleEnabled(false);
          toolbar.setLogo(R.drawable.logo);
@@ -132,8 +151,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.action_location:
-                showEvents=new ShowEvents();
-                Log.e("Searching","action_location");
+                ShowEvents showEvents=new ShowEvents();
+                Log.e("HOMEPAGE","showEvents");
                 Intent intent=new Intent(this, ShowEvents.class);
                 intent.putExtra("username",username);
                 finish();
@@ -311,6 +330,15 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         return true;
     }
 
+    private void updateWithToken(AccessToken currentAccessToken) {
+        if(currentAccessToken!=null){
+            Log.e("Facebook","Loggedin");
+        }
+        else{
+            Log.e("Facebook","Not logged in");
+        }
+    }
+
     public void feed(View view)
     {
         Button user = (Button) findViewById(R.id.user_button);
@@ -433,21 +461,31 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         }
     }
 
-     public void retreiveFromDatabase(Context context){
+     public void retreiveFromDatabase(Context context,Boolean isforsearch){
         Log.e(STRING_TAG,"database");
         if(checkConnection(this)){
-            for (int i=0;i < userid.size();i++)
-            {
-                Log.i("Value of element "+i,fusername.get(i));
-                stat_forsearch_eventRecyclerView.initializeDataFollow(userid.get(i),fusername.get(i),useremail.get(i),context);
-                stat_forsearch_Useradapter = new EventRecyclerView.FollowItemAdapter(context, stat_forsearch_eventRecyclerView.getItemFollow(),username);
-               /* mRecyclerView.setAdapter(staticadapter);*/
+            if(isforsearch) {
+                for (int i = 0; i < search_userid.size(); i++) {
+                    Log.i("Value of element " + i, search_username.get(i));
+                    stat_forsearch_eventRecyclerView.initializeDataFollow(search_userid.get(i), search_username.get(i), search_useremail.get(i), context);
+                    stat_forsearch_Useradapter = new EventRecyclerView.FollowItemAdapter(context, stat_forsearch_eventRecyclerView.getItemFollow(), username, false);
+                   /* mRecyclerView.setAdapter(staticadapter);*/
+                }
             }
+            else {
+                for (int i = 0; i < invite_userid.size(); i++) {
+                    Log.i("Value of element " + i, invite_username.get(i));
+                    stat_forinvite_eventRecyclerView.initializeDataFollow(invite_userid.get(i), invite_username.get(i), invite_useremail.get(i), context);
+                    //stat_forinvite_Useradapter = new EventRecyclerView.FollowItemAdapter(context, stat_forsearch_eventRecyclerView.getItemFollow(), username, false);
+                   /* mRecyclerView.setAdapter(staticadapter);*/
+                }
+            }
+
         }
 
     }
 
-    public void listenerFunction(String username){
+    public void listenerFunction(String username, final List<String>userid, final List<String>fusername, final List<String>useremail, final Boolean isforsearch){
         Log.e(STRING_TAG,"insideListiner");
         Response.Listener<String> responseListener= new Response.Listener<String>() {
             @Override
@@ -484,7 +522,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                                 useremail.add(jsonArray3.get(i).toString());
                             }
 
-                            retreiveFromDatabase(HomePage.this);
+                            retreiveFromDatabase(HomePage.this,isforsearch);
                         }
                         else
                             Log.e(STRING_TAG,"insideNull");
@@ -503,9 +541,16 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             }
         };
         if(checkConnection(this)){
-            RecyclerRequest recyclerRequest=new RecyclerRequest(username,"alluser", responseListener);
-            RequestQueue queue = Volley.newRequestQueue(this);
-            queue.add(recyclerRequest);
+            if(isforsearch){
+                RecyclerRequest recyclerRequest=new RecyclerRequest(username,"alluser", responseListener);
+                RequestQueue queue = Volley.newRequestQueue(this);
+                queue.add(recyclerRequest);
+            }
+            else{
+                RecyclerRequest recyclerRequest=new RecyclerRequest(username,"followuser", responseListener);
+                RequestQueue queue = Volley.newRequestQueue(this);
+                queue.add(recyclerRequest);
+            }
         }
     }
 

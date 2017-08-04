@@ -34,6 +34,17 @@ import static semproject.nevent.Recent.extracteventOrganizer;
 import static semproject.nevent.Recent.extractlatitude;
 import static semproject.nevent.Recent.extractlongitude;
 import static semproject.nevent.Recent.extractviewcount;
+import static semproject.nevent.Userdetail.fbeventCategory;
+import static semproject.nevent.Userdetail.fbeventDate;
+import static semproject.nevent.Userdetail.fbeventId;
+import static semproject.nevent.Userdetail.fbeventList;
+import static semproject.nevent.Userdetail.fbeventLocation;
+import static semproject.nevent.Userdetail.fbevent_descrp;
+import static semproject.nevent.Userdetail.fbevent_org;
+import static semproject.nevent.Userdetail.fbevent_picpath;
+import static semproject.nevent.Userdetail.fblatitude;
+import static semproject.nevent.Userdetail.fblongitude;
+import static semproject.nevent.Userdetail.fbviewcount;
 
 
 /**
@@ -42,6 +53,7 @@ import static semproject.nevent.Recent.extractviewcount;
 
 public class NearByList extends Fragment implements ConnectivityReceiver.ConnectivityReceiverListener {
     private RecyclerView mRecyclerView;
+    private RecyclerView mfbRecyclerView;
     String STRING_TAG="NearByList";
     String username;
     public static List<String> neareventId=new ArrayList<>();
@@ -53,11 +65,12 @@ public class NearByList extends Fragment implements ConnectivityReceiver.Connect
     public static List<Integer>nearviewcount=new ArrayList<>();
     public static List<Double>nearlatitude=new ArrayList<>();
     public static List<Double>nearlongitude=new ArrayList<>();
+    public static List<String>neareventPath=new ArrayList<>();
+    public static List<String>neareventDescrip=new ArrayList<>();
 
 
 
     public NearByList() {
-        // Required empty public constructor
         staticeventRecyclerView=new EventRecyclerView();
         staticadapter=new EventRecyclerView.AllItemAdapter();
     }
@@ -66,66 +79,106 @@ public class NearByList extends Fragment implements ConnectivityReceiver.Connect
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        staticeventRecyclerView=new EventRecyclerView();
+        staticadapter=new EventRecyclerView.AllItemAdapter();
         username = getArguments().getString("username");
         View rootView = inflater.inflate(R.layout.fragment_recent, container, false);
 
+        // Required empty public constructor
         // BEGIN_INCLUDE(initializeRecyclerView)
-        RecyclerView.LayoutManager mLayoutManager;
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.all_recycler_view);
-        if (mRecyclerView != null) {
-            mRecyclerView.setHasFixedSize(true);
-        }
 
 
         // LinearLayoutManager is used here, this will layout the elements in a similar fashion
         // to the way ListView would layout elements. The RecyclerView.LayoutManager defines how
         // elements are laid out.
-        mLayoutManager = new LinearLayoutManager(getActivity());
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        listenerFunction();
+
+        //second recycler
+        mfbRecyclerView = (RecyclerView) rootView.findViewById(R.id.nearby_recycler_view);
+        if (mfbRecyclerView != null) {
+            mfbRecyclerView.setHasFixedSize(true);
+        }
+        mfbRecyclerView.setLayoutManager(
+                new LinearLayoutManager(this.getContext(),LinearLayoutManager.VERTICAL, false));
+
+        //first recycler
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.all_recycler_view);
+        if (mRecyclerView != null) {
+            mRecyclerView.setHasFixedSize(true);
+        }
+        mRecyclerView.setLayoutManager(
+                new LinearLayoutManager(this.getContext(),LinearLayoutManager.VERTICAL, false));
+
+        listenerFunction(false,ShowEvents.la,ShowEvents.ln,extracteventId,
+                extracteventList,extracteventLocation,extracteventDate,extracteventCategory,
+                extracteventOrganizer,extractviewcount,extractlatitude,extractlongitude,null,null);
+
+        if(ShowEvents.isFbpresent){
+            Log.e("Nearlistener","facebook");
+            listenerFunction(ShowEvents.isFbpresent,ShowEvents.fbla,ShowEvents.fbln,fbeventId,
+                    fbeventList,fbeventLocation,fbeventDate,fbeventCategory,fbevent_org,
+                    fbviewcount,fblatitude,fblongitude,fbevent_picpath,fbevent_descrp);}
         return rootView;
     }
-    public void retreiveFromDatabase(){
+    public void retreiveFromDatabase(Boolean isFbpresent){
         float dist;
-        Log.e(STRING_TAG,"database");
+        Log.e(STRING_TAG,"nearbydatabase");
         if(checkConnection(getContext())){
             for (int i=0;i < neareventList.size();i++)
             {
-                Log.i("CheckIndexRemove "+i," "+neareventList.get(i));
-                dist= ShowEvents.distance.get(i)/1000;
-                DecimalFormat numberformat= new DecimalFormat("#.00");
-                dist=Float.parseFloat(numberformat.format(dist));
-                staticeventRecyclerView.initializeData(neareventId.get(i),neareventList.get(i),neareventCategory.get(i),neareventLocation.get(i),neareventDate.get(i),neareventOrganizer.get(i),nearviewcount.get(i),getContext(),dist);
-                staticadapter = new EventRecyclerView.AllItemAdapter(getContext(), staticeventRecyclerView.getItem(),username,true);
-                mRecyclerView.setAdapter(staticadapter);
+                if(isFbpresent) {
+                    Log.i("FBIndexRemove "+i," "+neareventList.get(i));
+                    dist = ShowEvents.fbdistance.get(i) / 1000;
+                    DecimalFormat numberformat= new DecimalFormat("#.00");
+                    dist=Float.parseFloat(numberformat.format(dist));
+                    staticeventRecyclerView.initializeDataFacebook(neareventId.get(i),neareventList.get(i),neareventCategory.get(i),neareventLocation.get(i),neareventDate.get(i),neareventOrganizer.get(i),nearviewcount.get(i),nearlatitude.get(i),nearlongitude.get(i),neareventPath.get(i),neareventDescrip.get(i),getContext());
+                    EventRecyclerView.FacebookItemAdapter fbadapter = new EventRecyclerView.FacebookItemAdapter(getContext(), staticeventRecyclerView.getItemFacebook(),username);
+                    mfbRecyclerView.setAdapter(fbadapter);
+                }else{
+                    Log.i("NFBIndexRemove "+i," "+neareventList.get(i));
+                    dist = ShowEvents.distance.get(i) / 1000;
+                    DecimalFormat numberformat= new DecimalFormat("#.00");
+                    dist=Float.parseFloat(numberformat.format(dist));
+                    staticeventRecyclerView.initializeData(neareventId.get(i),neareventList.get(i),neareventCategory.get(i),neareventLocation.get(i),neareventDate.get(i),neareventOrganizer.get(i),nearviewcount.get(i),getContext(),dist);
+                    EventRecyclerView.AllItemAdapter adapter = new EventRecyclerView.AllItemAdapter(getContext(), staticeventRecyclerView.getItem(),username,true);
+                    mRecyclerView.setAdapter(adapter);}
+
             }
-            neareventId=new ArrayList<>();
-            neareventList=new ArrayList<>();
-            neareventLocation=new ArrayList<>();
-            neareventDate=new ArrayList<>();
-            neareventCategory=new ArrayList<>();
-            neareventOrganizer=new ArrayList<>();
-            nearviewcount=new ArrayList<>();
-            nearlatitude=new ArrayList<>();
-            nearlongitude=new ArrayList<>();
+            neareventId.clear();
+            neareventList.clear();
+            neareventLocation.clear();
+            neareventDate.clear();
+            neareventCategory.clear();
+            neareventOrganizer.clear();
+            nearviewcount.clear();
+            nearlatitude.clear();
+            nearlongitude.clear();
+            neareventDescrip.clear();
+            neareventPath.clear();
 
         }
 
     }
 
-    public void listenerFunction(){
-        Log.e(STRING_TAG,"insideListiner");
+    public void listenerFunction(Boolean isFbpresent,List<Double>la,List<Double>ln,List<String> extracteventId,
+                                 List<String>extracteventList,List<String>extracteventLocation,
+                                 List<String>extracteventDate,List<String>extracteventCategory ,
+                                 List<String>extracteventOrganizer,List<Integer>extractviewcount ,
+                                 List<Double>extractlatitude,List<Double>extractlongitude,
+                                 List<String>extracteventPath,List<String>extracteventDescrip){
+
+        Log.e("Nearlistener","insideListiner");
         int out=0;
-        for(double lat1: ShowEvents.la){
+        for(double lat1:la){
             int inside=0;
             if(extractlatitude.isEmpty())
-                Log.e("Insideextractby","Null");
+                Log.e("Nearlistener","Null");
             else{
-                Log.e("InsideNearby","NOTNULL");
+                Log.e("Nearlistener","NOTNULL");
+                Log.e("Nearlistener ","Size"+Integer.toString(extracteventList.size()));
                 for(double lat2:extractlatitude){
-                    Log.e("CheckIndex ",Double.toString(lat1)+" "+Double.toString(lat2));
-                    if((Double.compare(lat1,lat2)==0)&&(Double.compare(ShowEvents.ln.get(out),extractlongitude.get(inside))==0)){
-                        Log.e("InsideChck ",Integer.toString(inside)+" "+extracteventList.get(inside));
+                    Log.e("Nearlistener ",Double.toString(lat1)+" "+Double.toString(lat2));
+                    if((Double.compare(lat1,lat2)==0)&&(Double.compare(ln.get(out),extractlongitude.get(inside))==0)){
+                        Log.e("Nearlistener ",Integer.toString(inside)+" "+extracteventList.get(inside));
                         nearlatitude.add(extractlatitude.get(inside));
                         nearlongitude.add(extractlongitude.get(inside));
                         neareventList.add(extracteventList.get(inside));
@@ -135,6 +188,10 @@ public class NearByList extends Fragment implements ConnectivityReceiver.Connect
                         neareventLocation.add(extracteventLocation.get(inside));
                         neareventOrganizer.add(extracteventOrganizer.get(inside));
                         nearviewcount.add(extractviewcount.get(inside));
+                        if(isFbpresent){
+                            neareventPath.add(extracteventPath.get(inside));
+                            neareventDescrip.add(extracteventDescrip.get(inside));
+                        }
                     }
                     inside++;
                 }
@@ -142,8 +199,8 @@ public class NearByList extends Fragment implements ConnectivityReceiver.Connect
 
             out++;
         }
-
-        retreiveFromDatabase();
+        Log.e("Nearlistener","outsideListiner.......");
+        retreiveFromDatabase(isFbpresent);
     }
 
     private boolean checkConnection(Context context) {

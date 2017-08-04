@@ -58,8 +58,6 @@ public class Recent extends Fragment implements ConnectivityReceiver.Connectivit
     List<Integer>viewcount=new ArrayList<>();
     static public List<Double>latitude=new ArrayList<>();
     static public List<Double>longitude=new ArrayList<>();
-    List<String>slatitude=new ArrayList<>();
-    List<String>slongitude=new ArrayList<>();
     List<Integer>outdatedEvent= new ArrayList<>();
 
     public static List<String> extracteventId=new ArrayList<>();
@@ -88,8 +86,8 @@ public class Recent extends Fragment implements ConnectivityReceiver.Connectivit
         staticadapter=new EventRecyclerView.AllItemAdapter();
         extractTime();
         username = getArguments().getString("username");
-        latitude=new ArrayList<>();
-        longitude=new ArrayList<>();
+        latitude.clear();
+        longitude.clear();
         View rootView = inflater.inflate(R.layout.fragment_recent, container, false);
 
         // BEGIN_INCLUDE(initializeRecyclerView)
@@ -126,15 +124,15 @@ public class Recent extends Fragment implements ConnectivityReceiver.Connectivit
     }
 
     public void listenerFunction(String username,final Context context){
-        extracteventId=new ArrayList<>();
-        extracteventList=new ArrayList<>();
-        extracteventLocation=new ArrayList<>();
-        extracteventDate=new ArrayList<>();
-        extracteventCategory=new ArrayList<>();
-        extracteventOrganizer=new ArrayList<>();
-        extractviewcount=new ArrayList<>();
-        extractlatitude=new ArrayList<>();
-        extractlongitude=new ArrayList<>();
+        extracteventId.clear();
+        extracteventList.clear();
+        extracteventLocation.clear();
+        extracteventDate.clear();
+        extracteventCategory.clear();
+        extracteventOrganizer.clear();
+        extractviewcount.clear();
+        extractlatitude.clear();
+        extractlongitude.clear();
         Log.e(STRING_TAG,"insideListiner");
         Response.Listener<String> responseListener= new Response.Listener<String>() {
             @Override
@@ -238,8 +236,8 @@ public class Recent extends Fragment implements ConnectivityReceiver.Connectivit
                                         longitude.add(Double.parseDouble(jsonArray9.get(i).toString()));
                                         extractlongitude.add(Double.parseDouble(jsonArray9.get(i).toString()));
                                     } catch (NumberFormatException e) {
-                                        longitude.add(1.00000);
-                                        extractlongitude.add(1.00000);
+                                        longitude.add(0.0000);
+                                        extractlongitude.add(0.0000);
                                     }
                                 }
                             }
@@ -259,8 +257,8 @@ public class Recent extends Fragment implements ConnectivityReceiver.Connectivit
                                         extractlatitude.add(Double.parseDouble(jsonArray8.get(i).toString()));
                                     }
                                     catch (NumberFormatException e) {
-                                        latitude.add(1.00000);
-                                        extractlatitude.add(1.00000);
+                                        latitude.add(0.0000);
+                                        extractlatitude.add(0.0000);
                                     }
                                 }
                             }

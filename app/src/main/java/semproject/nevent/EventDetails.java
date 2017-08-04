@@ -1,17 +1,25 @@
 package semproject.nevent;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,16 +31,25 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.List;
 
 import semproject.nevent.Connection.ConnectivityReceiver;
 import semproject.nevent.Connection.InternetConnection;
 import semproject.nevent.MapsActivities.ShowLocation;
 import semproject.nevent.Request.AttendingEventRequest;
+import semproject.nevent.Request.CountRequest;
 import semproject.nevent.Request.DetailRequest;
+import semproject.nevent.Request.InviteRequest;
 import semproject.nevent.Request.ParticipantRequest;
+
+import static semproject.nevent.EventRecyclerView.selecctedUser;
+import static semproject.nevent.HomePage.stat_forinvite_eventRecyclerView;
+import static semproject.nevent.HomePage.stat_forsearch_Useradapter;
+import static semproject.nevent.HomePage.stat_forsearch_eventRecyclerView;
 
 public class EventDetails extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener {
     String STRING_TAG="EventDetails";
@@ -40,7 +57,11 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
     ImageView downloadedimage;
     TextView veventLabel,veventLocation,veventDate,veventOrganizer,veventCategory,veventId,veventDetails,attendingtext, participantnumber;
     Button attendingbutton;
-    String eventId, eventLabel, eventLocation, eventDate, eventOrganizer, eventCategory,eventDetails,eventLatitude, eventLongitude, username;
+    Friendinvite friendinvite;
+    static public RecyclerView mRecyclerView;
+    //public RecyclerView.Adapter mAdapter;
+    Bitmap eventImage;
+    String eventId, eventLabel, eventLocation, eventDate, eventPath,eventOrganizer, eventCategory,eventDetails,eventLatitude, eventLongitude, username;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,10 +86,29 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
         eventDate=intent.getStringExtra("eventDate");
         eventOrganizer=intent.getStringExtra("eventOrganizer");
         eventCategory=intent.getStringExtra("eventCategory");
-        listenerFunction();
-        checkgoing();
+        Boolean check= intent.getBooleanExtra("check",true);
         downloadedimage=(ImageView) findViewById(R.id.detaildownloadedimage);
-        new Downloadimage(eventLabel).execute();
+        if(!check) {
+            eventDetails = intent.getStringExtra("description");
+            eventLatitude = intent.getStringExtra("latitude");
+            eventLongitude = intent.getStringExtra("longitude");
+            eventPath = intent.getStringExtra("path");
+            /*try{
+                eventImage=intent.getParcelableExtra("eventImage");
+                downloadedimage.setImageBitmap(eventImage);
+            }
+            catch (Exception e){
+                downloadedimage.setVisibility(View.GONE);
+                Log.e(STRING_TAG,"Image not found");
+            }*/
+            veventDetails.setText(eventDetails);
+            new Downloadimagefacebook(eventPath).execute();
+        }
+        else{
+            listenerFunction();
+            checkgoing();
+            new Downloadimage(eventLabel).execute();
+        }
         setvalues();
 
     }
@@ -86,11 +126,21 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
 
     public void showlocation(View view)
     {
-        Intent i= new Intent(this,ShowLocation.class);
-        i.putExtra("eventname",eventLabel);
-        i.putExtra("latitude",eventLatitude);
-        i.putExtra("longitude",eventLongitude);
-        startActivity(i);
+        if(Double.parseDouble(eventLatitude)==0.0&&Double.parseDouble(eventLongitude)==0.0){
+            String toastMesg = "Location is not set in map for this event.";
+            Toast toast = Toast.makeText(getApplicationContext(), toastMesg, Toast.LENGTH_SHORT);
+            TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
+            if (v != null) v.setGravity(Gravity.CENTER);
+            toast.show();
+        }
+        else{
+            Intent i= new Intent(this,ShowLocation.class);
+            i.putExtra("eventname",eventLabel);
+            i.putExtra("latitude",eventLatitude);
+            i.putExtra("longitude",eventLongitude);
+            startActivity(i);
+        }
+
 
     }
 
@@ -239,6 +289,115 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
         }
     }
 
+    public void invite(View view)
+    {
+        friendinvite = new Friendinvite();
+        Bundle bundle=new Bundle();
+        bundle.putString("username",username);
+        bundle.putString("eventID",eventId);
+        friendinvite.setArguments(bundle);
+        friendinvite.show(getSupportFragmentManager(), "details");
+    }
+
+
+    public static class Friendinvite extends DialogFragment {
+        String STRING_TAG="Friendinvite";
+        RecyclerView mRecyclerView;
+        EventRecyclerView inviterecyclerview = new EventRecyclerView();
+        EventRecyclerView.FollowItemAdapter adapter;
+        String username,eventID;
+        public Friendinvite()
+        {
+        }
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the Builder class for convenient dialog construction
+            username=getArguments().getString("username");
+            eventID=getArguments().getString("eventID");
+            final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Friend List")
+                    .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            for(String names:selecctedUser){
+                                listenerfunction(names);
+                                Log.e(STRING_TAG,names);
+                            }
+                            selecctedUser.clear();
+                            String toastMesg = "Thanks for promoting events!!";
+                            Toast toast = Toast.makeText(getContext().getApplicationContext(), toastMesg, Toast.LENGTH_SHORT);
+                            TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
+                            if (v != null) v.setGravity(Gravity.CENTER);
+                            toast.show();
+
+                            Log.e(STRING_TAG,"Inside dialog box");
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {// User cancelled the dialog
+                        }
+                    });
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            View view = inflater.inflate(R.layout.custom_dialog_box, null);
+            builder.setView(view);
+            mRecyclerView = (RecyclerView) view.findViewById(R.id.invite_recycler_view);
+            if (mRecyclerView != null) {
+                mRecyclerView.setHasFixedSize(true);
+            }
+            RecyclerView.LayoutManager mLayoutManager;
+            mLayoutManager = new LinearLayoutManager(getContext());
+            mRecyclerView.setLayoutManager(mLayoutManager);
+            setAdapterforInvite();
+            /*mRecyclerView.setAdapter(stat_forsearch_Useradapter);*/
+            // Create the AlertDialog object and return it
+            return builder.create();
+
+
+        }
+
+        void setAdapterforInvite(){
+            List<EventRecyclerView.Item_follow> extractedItem=stat_forinvite_eventRecyclerView.getItemFollow();
+            for(EventRecyclerView.Item_follow indevent: extractedItem){
+                inviterecyclerview.initializeDataFollow(indevent.followuserid,indevent.followusername,indevent.followemail,getContext());
+                adapter = new EventRecyclerView.FollowItemAdapter(indevent.context.getApplicationContext(), inviterecyclerview.getItemFollow(),username,true);
+                mRecyclerView.setAdapter(adapter);
+            }
+
+        }
+
+        void listenerfunction(String invitedname){
+            Log.e(STRING_TAG,"insideListiner");
+            Response.Listener<String> responseListener= new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    try {
+                        Log.e(STRING_TAG,"try");
+                        JSONObject jsonObject=new JSONObject(response);
+                        boolean success = jsonObject.getBoolean("success1");
+                        if(success){
+                            Log.e(STRING_TAG,"insideSuccess");
+                        }
+                        else {
+                            AlertDialog.Builder builder= new AlertDialog.Builder(getContext());
+                            builder.setMessage("Connection Failed")
+                                    .setNegativeButton("Retry",null)
+                                    .create()
+                                    .show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            Log.e(STRING_TAG,username);
+            Log.e(STRING_TAG,invitedname);
+            Log.e(STRING_TAG,eventID);
+            InviteRequest inviteRequest=new InviteRequest(username,invitedname,eventID,responseListener);
+            RequestQueue queue = Volley.newRequestQueue(getContext());
+            queue.add(inviteRequest);
+        }
+
+    }
 
     //For retrieving the image of event.
     private class Downloadimage extends AsyncTask<Void, Void, Bitmap>
@@ -274,6 +433,40 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
             if(bitmap!=null)
             {
                 Log.e(STRING_TAG,"Image downloaded");
+                downloadedimage.setImageBitmap(bitmap);
+            }
+        }
+    }
+
+    //For retrieving the image of facebook event
+    private class Downloadimagefacebook extends AsyncTask<Void, Void, Bitmap>
+    {
+        String path;
+        public Downloadimagefacebook(String path)
+        {
+            this.path=path;
+        }
+        @Override
+        protected Bitmap doInBackground(Void... params) {
+            try{
+                URLConnection connection=new URL(path).openConnection();
+                connection.setConnectTimeout(1000*30);
+                connection.setReadTimeout(1000*30);
+                return BitmapFactory.decodeStream((InputStream) connection.getContent(),null,null);
+
+            }catch(Exception e){
+                e.printStackTrace();
+                return null;
+            }
+
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+            if(bitmap!=null)
+            {
+                Log.e(STRING_TAG,"FacebookImage downloaded");
                 downloadedimage.setImageBitmap(bitmap);
             }
         }

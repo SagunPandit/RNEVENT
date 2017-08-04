@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -60,6 +62,8 @@ public class EventRecyclerView {
     private final static String LOG_TAGS="Holder name down";
     private List<Item> items = new ArrayList<>();
     private List<Item_follow> items_follow = new ArrayList<>();
+    private List<Item_facebook> items_facebook=new ArrayList<>();
+    public static List<String> selecctedUser=new ArrayList<>();
 
     public EventRecyclerView() {
 
@@ -67,25 +71,50 @@ public class EventRecyclerView {
 
     public void initializeData(String eventid,String eventname,String eventcategory,String eventlocation,String eventdate,String organizer,Integer viewcount,Context context,float distance) {
         items.add(new Item(eventid,eventname, eventcategory,eventlocation,eventdate,organizer,viewcount,context,distance));
-        Log.e(STRING_TAG,eventname+" data initialized");
+        Log.e(STRING_TAG+"item",eventname+" data initialized");
+        Log.e(STRING_TAG+"init",Integer.toString(items.size()));
 
     }
 
-    public void initializeDataFollow(String followusername,String followid,String followemail, Context context) {
-        items_follow.add(new Item_follow(followusername,followid, followemail,context));
-        Log.e(STRING_TAG,followusername+" data initialized");
+    public void initializeDataFollow(String followid,String followusername,String followemail, Context context) {
+        items_follow.add(new Item_follow(followid,followusername, followemail,context));
+        Log.e(STRING_TAG+"follow",followusername+" data initialized");
+        Log.e(STRING_TAG+"init",Integer.toString(items_follow.size()));
+    }
+
+    public void initializeDataFacebook(String eventid,String eventname,String eventcategory,String eventlocation,String eventdate,String eventOrganizer,Integer count,Double lat, Double longi, String path,String description,Context context) {
+        try{
+            items_facebook.add(new Item_facebook(eventid,eventname,eventcategory,eventlocation,eventdate,eventOrganizer,count,lat,longi,path,description,context));
+            Log.e(STRING_TAG+"fb",eventname+" facebook data initialized");
+            Log.e(STRING_TAG+"init",Integer.toString(items_facebook.size()));
+        }catch (Exception e){
+            Log.e(STRING_TAG,"Unexpected Error");
+            /*String toastMesg = "Facebook server error. Try again!!";
+            Toast toast = Toast.makeText(context, toastMesg, Toast.LENGTH_SHORT);
+            TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
+            if (v != null) v.setGravity(Gravity.CENTER);
+            toast.show();*/
+        }
 
     }
 
     public List getItem(){
         return items;
     }
-    public List getItemFollow(){return items_follow;}
+    public List getItemFollow(){
+        //Log.i(STRING_TAG,"Total Items"+Integer.toString(items_facebook.size()));
+        return items_follow;}
+    public List getItemFacebook(){
+        Log.i(STRING_TAG,"Total Items"+Integer.toString(items_facebook.size()));
+        return items_facebook;}
 
     public void emptyItems(){
         items=Collections.emptyList();
     }
     public void emptyItemsFollow(){items_follow=Collections.emptyList();}
+    public void emptyItemsFacebook(){
+        if(!items_facebook.isEmpty())
+            items_facebook=Collections.emptyList();}
     public class Item {
         public String eventLabel;
         public String eventId,eventLocation,eventDate,eventOrganizer,eventCategory;
@@ -122,6 +151,33 @@ public class EventRecyclerView {
 
     }
 
+    public class Item_facebook {
+        public String eventLabel;
+        public String eventId,eventLocation,eventDate,eventOrganizer,eventCategory;
+        public Context context;
+        public int viewcount;
+        public Double latitude;
+        public Double longitude;
+        public String picpath;
+        public String description;
+
+        Item_facebook(String eventid,String eventname,String eventcategory,String eventlocation,String eventdate,String eventOrganizer,Integer count,Double lat, Double longi, String path,String description,Context context) {
+            this.eventId=eventid;
+            this.eventLabel=eventname;
+            this.eventLocation=eventlocation;
+            this.eventDate=eventdate;
+            this.eventOrganizer=eventOrganizer;
+            this.eventCategory=eventcategory;
+            this.context=context;
+            this.description=description;
+            latitude=lat;
+            longitude=longi;
+            picpath=path;
+            viewcount=count;
+        }
+
+    }
+
     private static void listenerFunction(String eventname,Integer viewcount,final Context context){
         Log.e("EventRecyclerView","insideListiner");
         Response.Listener<String> responseListener= new Response.Listener<String>() {
@@ -150,7 +206,6 @@ public class EventRecyclerView {
         RequestQueue queue = Volley.newRequestQueue(context);
         queue.add(countRequest);
     }
-
 
     // Creating an Adapter i.e to add each items in recyclerView
     public static class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder> implements ConnectivityReceiver.ConnectivityReceiverListener {
@@ -247,6 +302,7 @@ public class EventRecyclerView {
                         intent.putExtra("eventCategory",holder.eventCategory.getText().toString());
                         intent.putExtra("eventOrganizer",holder.eventOrganizer.getText().toString());
                         intent.putExtra("username",username);
+                        intent.putExtra("check",true);
                         currentItem.context.startActivity(intent);
                     }
 
@@ -576,6 +632,7 @@ public class EventRecyclerView {
                         intent.putExtra("eventDate",holder.eventDate.getText().toString());
                         intent.putExtra("eventCategory",holder.eventCategory.getText().toString());
                         intent.putExtra("eventOrganizer",holder.eventOrganizer.getText().toString());
+                        intent.putExtra("check",true);
                         currentItem.context.startActivity(intent);
                     }
                 }
@@ -800,6 +857,20 @@ public class EventRecyclerView {
         List<Item_follow> items_follow= Collections.emptyList();
         Item_follow currentItem;
         String username;
+        Boolean fromInvite=false;
+        public FollowItemAdapter(){
+           /* Log.e(STRING_TAG,Integer.toString(check));
+            check++;*/
+        }
+        // Constructor to inflate layout of each item in RecyclerView
+        public FollowItemAdapter(Context context, List<Item_follow> items, String username, Boolean fromInvite) {
+            inflater = LayoutInflater.from(context);
+            this.items_follow = items;
+            this.username=username;
+            this.fromInvite=fromInvite;
+           /* Log.e(STRING_TAG,"itemadpter "+Integer.toString(check));*/
+
+        }
 
         @Override
         public FollowViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -837,36 +908,48 @@ public class EventRecyclerView {
             holder.followUserid.setText(currentItem.followuserid);
             Log.v("Holder name up", holder.followUsername.getText().toString());
 
-            holder.followLinear.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(checkConnection()){
-                        Intent i=new Intent(currentItem.context, Otheruserprofile.class);
-                        i.putExtra("username",username);
-                        i.putExtra("otherusername",holder.followUsername.getText().toString());
-                        currentItem.context.startActivity(i);
-                        Log.e(STRING_TAG,username);
+            if(fromInvite){
+                holder.followLinear.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        TextView name= (TextView) v.findViewById(R.id.follow_unclick);
+                        String check= name.getText().toString();
+                        String followusername= holder.followUsername.getText().toString();
+                        TextView followname= (TextView) v.findViewById(R.id.follow_username);
+                        LinearLayout ll = (LinearLayout) v.findViewById(R.id.follow_layout);
+                        if(check.contains("true")){
+                            selecctedUser.remove(followusername);
+                            ll.setBackgroundResource(0);
+                            followname.setTextColor(Color.BLACK);
+                            name.setText("false");}
+                        else{
+                            name.setText("true");
+                            ll.setBackgroundResource(R.drawable.selectuserback);
+                            followname.setTextColor(Color.BLUE);
+                            selecctedUser.add(followusername);
+                        }
                     }
-                }
-            });
+                });
+
+            }else {
+                holder.followLinear.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(checkConnection()){
+                            Intent i=new Intent(currentItem.context, Otheruserprofile.class);
+                            i.putExtra("username",username);
+                            i.putExtra("otherusername",holder.followUsername.getText().toString());
+                            currentItem.context.startActivity(i);
+                            Log.e(STRING_TAG,username);
+                        }
+                    }
+                });
+            }
         }
 
         @Override
         public int getItemCount() {
             return items_follow.size();
-        }
-
-        public FollowItemAdapter(){
-           /* Log.e(STRING_TAG,Integer.toString(check));
-            check++;*/
-        }
-        // Constructor to inflate layout of each item in RecyclerView
-        public FollowItemAdapter(Context context, List<Item_follow> items, String username) {
-            inflater = LayoutInflater.from(context);
-            this.items_follow = items;
-            this.username=username;
-           /* Log.e(STRING_TAG,"itemadpter "+Integer.toString(check));*/
-
         }
 
         private boolean checkConnection() {
@@ -972,5 +1055,188 @@ public class EventRecyclerView {
             }
         }
     }
+
+    //For facebook events
+    public static class FacebookItemAdapter extends RecyclerView.Adapter<FacebookItemAdapter.FacebookViewHolder> implements ConnectivityReceiver.ConnectivityReceiverListener {
+
+        String STRING_TAG= "FacebookItemAdapter";
+        String username;
+        /* private instance variable to store Layout of each item. */
+        private LayoutInflater inflater;
+        /* Store data */
+        List<Item_facebook> items = Collections.emptyList();
+        Item_facebook currentItem;
+        private boolean checkConnection() {
+            Log.e(STRING_TAG,"checkConnection");
+            boolean isConnected = ConnectivityReceiver.isConnected(currentItem.context);
+            if(!isConnected){
+                Intent intent= new Intent(currentItem.context,InternetConnection.class);
+                ((Activity)currentItem.context).finish();
+                currentItem.context.startActivity(intent);
+            }
+            return isConnected;
+        }
+
+        @Override
+        public void onNetworkConnectionChanged(boolean isConnected) {
+            if(isConnected){
+                Intent intent= new Intent(currentItem.context,MainActivity.class);
+                ((Activity)currentItem.context).finish();
+                currentItem.context.startActivity(intent);
+            }
+            else{
+                Intent intent= new Intent(currentItem.context,InternetConnection.class);
+                ((Activity)currentItem.context).finish();
+                currentItem.context.startActivity(intent);
+            }
+        }
+
+        // Constructor to inflate layout of each item in RecyclerView
+        public FacebookItemAdapter(Context context, List<Item_facebook> items,String name) {
+            inflater = LayoutInflater.from(context);
+            this.items = items;
+            this.username =name;
+        }
+
+        //create a view holder of items
+        @Override
+        public FacebookViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            Log.v(LOG_TAG, "onCreateViewHolder called.");
+            View view = inflater.inflate(R.layout.events_details, parent, false);
+
+            FacebookViewHolder holder = new FacebookViewHolder(view);
+
+            return holder;
+        }
+
+        //binds all the views from view holder to form a single view and show the binded view
+        @Override
+        public void onBindViewHolder(final FacebookViewHolder holder, final int position) {
+            Log.v(LOG_TAG, "onBindViewHolder called.");
+            currentItem = items.get(position);
+
+            holder.downloadedimage.setVisibility(View.GONE);
+            new Downloadimagefacebook(holder, currentItem.picpath, position).execute();
+            holder.eventLocation.setText(currentItem.eventLocation);
+            holder.eventLabel.setText(currentItem.eventLabel);
+            holder.eventDate.setText(currentItem.eventDate);
+            holder.eventCategory.setText(currentItem.eventCategory);
+            holder.eventOrganizer.setText(currentItem.eventOrganizer);
+            holder.eventId.setText(currentItem.eventId);
+            holder.eventDelete.setVisibility(View.GONE);
+            holder.eventLinear.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(checkConnection()){
+                        Intent intent=new Intent (currentItem.context,EventDetails.class);
+                        intent.putExtra("eventId",holder.eventId.getText().toString());
+                        intent.putExtra("eventLabel",holder.eventLabel.getText().toString());
+                        intent.putExtra("eventLocation",holder.eventLocation.getText().toString());
+                        intent.putExtra("eventDate",holder.eventDate.getText().toString());
+                        intent.putExtra("eventCategory",holder.eventCategory.getText().toString());
+                        intent.putExtra("eventOrganizer",holder.eventOrganizer.getText().toString());
+                        intent.putExtra("latitude",Double.toString(currentItem.latitude));
+                        intent.putExtra("longitude",Double.toString(currentItem.longitude));
+                        intent.putExtra("path",currentItem.picpath);
+                        intent.putExtra("description",currentItem.description);
+                        intent.putExtra("username",username);
+                        /*try{
+                        intent.putExtra("eventImage", ((BitmapDrawable)holder.downloadedimage.getDrawable()).getBitmap());}
+                        catch (Exception e){
+                            Log.e(STRING_TAG,"image not found");
+                        }*/
+                        intent.putExtra("check",false);
+                        currentItem.context.startActivity(intent);
+                    }
+
+                }
+
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return items.size();
+        }
+
+        /* ViewHolder for this adapter */
+        class FacebookViewHolder extends RecyclerView.ViewHolder {
+            LinearLayout eventLinear;
+            TextView eventLabel;
+            TextView eventLocation;
+            TextView eventDate;
+            TextView eventOrganizer;
+            ImageButton eventDelete;
+            TextView eventCategory;
+            ImageView downloadedimage;
+            TextView eventId;
+
+            public FacebookViewHolder(View itemView) {
+                super(itemView);
+                eventLinear=(LinearLayout) itemView.findViewById(R.id.linear1);
+                eventId=(TextView) itemView.findViewById(R.id.eventId);
+                eventCategory=(TextView) itemView.findViewById(R.id.eventCategory);
+                eventLabel = (TextView) itemView.findViewById(R.id.eventLabel);
+                eventLocation = (TextView) itemView.findViewById(R.id.eventLocation);
+                eventDate=(TextView) itemView.findViewById(R.id.eventDate);
+                eventOrganizer=(TextView) itemView.findViewById(R.id.eventOrganizer);
+                eventDelete=(ImageButton) itemView.findViewById(R.id.eventDelete);
+                downloadedimage=(ImageView) itemView.findViewById(R.id.downloadedpicture);
+            }
+        }
+
+
+        //For retrieving the image of event.
+        private class Downloadimagefacebook extends AsyncTask<Void, Void, Bitmap>
+        {
+            String phototpath;
+            int position;
+            FacebookViewHolder holder;
+            public Downloadimagefacebook(FacebookViewHolder holder, String path, int position)
+            {
+                this.position=position;
+                this.holder=holder;
+                this.phototpath=path;
+            }
+            @Override
+            protected Bitmap doInBackground(Void... params) {
+                try{
+                    URLConnection connection=new URL(phototpath).openConnection();
+                    connection.setConnectTimeout(1000*30);
+                    connection.setReadTimeout(1000*30);
+                    return BitmapFactory.decodeStream((InputStream) connection.getContent(),null,null);
+
+                }catch(Exception e){
+                    e.printStackTrace();
+                    return null;
+                }
+
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+                super.onPostExecute(bitmap);
+                if(bitmap!=null)
+                {
+                    Log.v(LOG_TAGS, "Photo received.");
+                    holder.downloadedimage.setVisibility(View.VISIBLE);
+                    holder.downloadedimage.setImageBitmap(bitmap);
+                }
+                else
+                {
+                    holder.downloadedimage.setVisibility(View.GONE);
+                }
+            }
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
 
