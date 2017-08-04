@@ -112,7 +112,9 @@ public class EventRecyclerView {
         items=Collections.emptyList();
     }
     public void emptyItemsFollow(){items_follow=Collections.emptyList();}
-    public void emptyItemsFacebook(){items_facebook=Collections.emptyList();}
+    public void emptyItemsFacebook(){
+        if(!items_facebook.isEmpty())
+            items_facebook=Collections.emptyList();}
     public class Item {
         public String eventLabel;
         public String eventId,eventLocation,eventDate,eventOrganizer,eventCategory;

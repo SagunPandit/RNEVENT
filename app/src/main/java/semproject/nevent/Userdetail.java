@@ -99,6 +99,7 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        eventRecyclerView = new EventRecyclerView();
         callbackManager = CallbackManager.Factory.create();
         FacebookSdk.sdkInitialize(getContext().getApplicationContext());
         username = getArguments().getString("username");
