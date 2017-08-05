@@ -88,9 +88,9 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         updateWithToken(AccessToken.getCurrentAccessToken());
 
         listenerFunction(username,search_userid,search_username,search_useremail,true);
-        listenerFunction(username,invite_userid,invite_username,invite_useremail,false);
         if (id==1)
         {
+            listenerFunction(username,invite_userid,invite_username,invite_useremail,false);
             Recent recent = new Recent();
             Bundle bundle = new Bundle();
             bundle.putString("username", username);
@@ -466,7 +466,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         if(checkConnection(this)){
             if(isforsearch) {
                 for (int i = 0; i < search_userid.size(); i++) {
-                    Log.i("Value of element " + i, search_username.get(i));
+                    Log.i("Value ofselement " + i, search_username.get(i));
                     stat_forsearch_eventRecyclerView.initializeDataFollow(search_userid.get(i), search_username.get(i), search_useremail.get(i), context);
                     stat_forsearch_Useradapter = new EventRecyclerView.FollowItemAdapter(context, stat_forsearch_eventRecyclerView.getItemFollow(), username, false);
                    /* mRecyclerView.setAdapter(staticadapter);*/
@@ -474,10 +474,10 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
             }
             else {
                 for (int i = 0; i < invite_userid.size(); i++) {
-                    Log.i("Value of element " + i, invite_username.get(i));
+                    Log.i("Value of homeelement " + i, invite_username.get(i));
                     stat_forinvite_eventRecyclerView.initializeDataFollow(invite_userid.get(i), invite_username.get(i), invite_useremail.get(i), context);
                     //stat_forinvite_Useradapter = new EventRecyclerView.FollowItemAdapter(context, stat_forsearch_eventRecyclerView.getItemFollow(), username, false);
-                   /* mRecyclerView.setAdapter(staticadapter);*/
+                    //mRecyclerView.setAdapter(staticadapter);
                 }
             }
 
@@ -547,6 +547,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                 queue.add(recyclerRequest);
             }
             else{
+                stat_forinvite_eventRecyclerView=new EventRecyclerView();
                 RecyclerRequest recyclerRequest=new RecyclerRequest(username,"followuser", responseListener);
                 RequestQueue queue = Volley.newRequestQueue(this);
                 queue.add(recyclerRequest);

@@ -82,9 +82,9 @@ public class EventRecyclerView {
         Log.e(STRING_TAG+"init",Integer.toString(items_follow.size()));
     }
 
-    public void initializeDataFacebook(String eventid,String eventname,String eventcategory,String eventlocation,String eventdate,String eventOrganizer,Integer count,Double lat, Double longi, String path,String description,Context context) {
+    public void initializeDataFacebook(String eventid,String eventname,String eventcategory,String eventlocation,String eventdate,String eventOrganizer,Integer count,Double lat, Double longi, String path,String description,Context context,float distance) {
         try{
-            items_facebook.add(new Item_facebook(eventid,eventname,eventcategory,eventlocation,eventdate,eventOrganizer,count,lat,longi,path,description,context));
+            items_facebook.add(new Item_facebook(eventid,eventname,eventcategory,eventlocation,eventdate,eventOrganizer,count,lat,longi,path,description,context,distance));
             Log.e(STRING_TAG+"fb",eventname+" facebook data initialized");
             Log.e(STRING_TAG+"init",Integer.toString(items_facebook.size()));
         }catch (Exception e){
@@ -160,8 +160,9 @@ public class EventRecyclerView {
         public Double longitude;
         public String picpath;
         public String description;
+        public Float distance;
 
-        Item_facebook(String eventid,String eventname,String eventcategory,String eventlocation,String eventdate,String eventOrganizer,Integer count,Double lat, Double longi, String path,String description,Context context) {
+        Item_facebook(String eventid,String eventname,String eventcategory,String eventlocation,String eventdate,String eventOrganizer,Integer count,Double lat, Double longi, String path,String description,Context context,float distance) {
             this.eventId=eventid;
             this.eventLabel=eventname;
             this.eventLocation=eventlocation;
@@ -170,6 +171,7 @@ public class EventRecyclerView {
             this.eventCategory=eventcategory;
             this.context=context;
             this.description=description;
+            this.distance=distance;
             latitude=lat;
             longitude=longi;
             picpath=path;
@@ -1061,6 +1063,7 @@ public class EventRecyclerView {
 
         String STRING_TAG= "FacebookItemAdapter";
         String username;
+        Boolean isfornearby;
         /* private instance variable to store Layout of each item. */
         private LayoutInflater inflater;
         /* Store data */
@@ -1092,17 +1095,18 @@ public class EventRecyclerView {
         }
 
         // Constructor to inflate layout of each item in RecyclerView
-        public FacebookItemAdapter(Context context, List<Item_facebook> items,String name) {
+        public FacebookItemAdapter(Context context, List<Item_facebook> items,String name,Boolean isfornearby) {
             inflater = LayoutInflater.from(context);
             this.items = items;
             this.username =name;
+            this.isfornearby=isfornearby;
         }
 
         //create a view holder of items
         @Override
         public FacebookViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             Log.v(LOG_TAG, "onCreateViewHolder called.");
-            View view = inflater.inflate(R.layout.events_details, parent, false);
+            View view = inflater.inflate(R.layout.allevents_details, parent, false);
 
             FacebookViewHolder holder = new FacebookViewHolder(view);
 
@@ -1124,6 +1128,12 @@ public class EventRecyclerView {
             holder.eventOrganizer.setText(currentItem.eventOrganizer);
             holder.eventId.setText(currentItem.eventId);
             holder.eventDelete.setVisibility(View.GONE);
+            if(isfornearby){
+                String holderdistance=Float.toString(currentItem.distance);
+                holder.distancevalue.setText(holderdistance);
+                holder.distancetext.setVisibility(View.VISIBLE);
+                holder.distancevalue.setVisibility(View.VISIBLE);
+            }
             holder.eventLinear.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -1139,6 +1149,7 @@ public class EventRecyclerView {
                         intent.putExtra("longitude",Double.toString(currentItem.longitude));
                         intent.putExtra("path",currentItem.picpath);
                         intent.putExtra("description",currentItem.description);
+                        intent.putExtra("attendingcount",Integer.toString(currentItem.viewcount));
                         intent.putExtra("username",username);
                         /*try{
                         intent.putExtra("eventImage", ((BitmapDrawable)holder.downloadedimage.getDrawable()).getBitmap());}
@@ -1170,18 +1181,24 @@ public class EventRecyclerView {
             TextView eventCategory;
             ImageView downloadedimage;
             TextView eventId;
+            TextView eventView;
+            TextView distancetext;
+            TextView distancevalue;
 
             public FacebookViewHolder(View itemView) {
                 super(itemView);
-                eventLinear=(LinearLayout) itemView.findViewById(R.id.linear1);
-                eventId=(TextView) itemView.findViewById(R.id.eventId);
-                eventCategory=(TextView) itemView.findViewById(R.id.eventCategory);
-                eventLabel = (TextView) itemView.findViewById(R.id.eventLabel);
-                eventLocation = (TextView) itemView.findViewById(R.id.eventLocation);
-                eventDate=(TextView) itemView.findViewById(R.id.eventDate);
-                eventOrganizer=(TextView) itemView.findViewById(R.id.eventOrganizer);
-                eventDelete=(ImageButton) itemView.findViewById(R.id.eventDelete);
-                downloadedimage=(ImageView) itemView.findViewById(R.id.downloadedpicture);
+                eventLinear=(LinearLayout) itemView.findViewById(R.id.alllinear1);
+                eventId=(TextView) itemView.findViewById(R.id.alleventId);
+                eventCategory=(TextView) itemView.findViewById(R.id.alleventCategory);
+                eventLabel = (TextView) itemView.findViewById(R.id.alleventLabel);
+                eventLocation = (TextView) itemView.findViewById(R.id.alleventLocation);
+                eventDate=(TextView) itemView.findViewById(R.id.alleventDate);
+                eventOrganizer=(TextView) itemView.findViewById(R.id.alleventOrganizer);
+                eventView= (TextView) itemView.findViewById(R.id.alleventView);
+                eventDelete=(ImageButton) itemView.findViewById(R.id.alleventDelete);
+                downloadedimage=(ImageView) itemView.findViewById(R.id.alldownloadedimage);
+                distancetext=(TextView) itemView.findViewById(R.id.distanceid);
+                distancevalue=(TextView) itemView.findViewById(R.id.distancevalue);
             }
         }
 

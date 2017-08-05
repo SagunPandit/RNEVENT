@@ -314,7 +314,7 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
         }
         else{
             eventRecyclerView.emptyItemsFacebook();
-            RecyclerView.Adapter mAdapter = new EventRecyclerView.FacebookItemAdapter(getContext(), eventRecyclerView.getItemFacebook(), username);
+            RecyclerView.Adapter mAdapter = new EventRecyclerView.FacebookItemAdapter(getContext(), eventRecyclerView.getItemFacebook(), username,false);
             mRecyclerView.setAdapter(mAdapter);
             fbbutton.setVisibility(View.GONE);
             Log.e("Facebook","Not logged in");
@@ -489,7 +489,7 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
         if(checkConnection(getActivity())) {
             if (fbeventList.isEmpty()) {
                 eventRecyclerView.emptyItemsFacebook();
-                RecyclerView.Adapter mAdapter = new EventRecyclerView.FacebookItemAdapter(getContext(), eventRecyclerView.getItemFacebook(), username);
+                RecyclerView.Adapter mAdapter = new EventRecyclerView.FacebookItemAdapter(getContext(), eventRecyclerView.getItemFacebook(), username,false);
                 mRecyclerView.setAdapter(mAdapter);
                 denoteempty.setVisibility(View.VISIBLE);
             }
@@ -510,8 +510,8 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
                     Log.i("FValue element " + i, fbevent_picpath.get(i));
 
                     eventRecyclerView.initializeDataFacebook(fbeventId.get(i), fbeventList.get(i), fbeventCategory.get(i), fbeventLocation.get(i), fbeventDate.get(i),
-                            fbevent_org.get(i), fbviewcount.get(i), fblatitude.get(i), fblongitude.get(i), fbevent_picpath.get(i), fbevent_descrp.get(i), getContext());
-                    RecyclerView.Adapter mAdapter = new EventRecyclerView.FacebookItemAdapter(getContext(), eventRecyclerView.getItemFacebook(), username);
+                            fbevent_org.get(i), fbviewcount.get(i), fblatitude.get(i), fblongitude.get(i), fbevent_picpath.get(i), fbevent_descrp.get(i), getContext(),0);
+                    RecyclerView.Adapter mAdapter = new EventRecyclerView.FacebookItemAdapter(getContext(), eventRecyclerView.getItemFacebook(), username,false);
                     mRecyclerView.setAdapter(mAdapter);
                 }
             }

@@ -130,8 +130,8 @@ public class NearByList extends Fragment implements ConnectivityReceiver.Connect
                     dist = ShowEvents.fbdistance.get(i) / 1000;
                     DecimalFormat numberformat= new DecimalFormat("#.00");
                     dist=Float.parseFloat(numberformat.format(dist));
-                    staticeventRecyclerView.initializeDataFacebook(neareventId.get(i),neareventList.get(i),neareventCategory.get(i),neareventLocation.get(i),neareventDate.get(i),neareventOrganizer.get(i),nearviewcount.get(i),nearlatitude.get(i),nearlongitude.get(i),neareventPath.get(i),neareventDescrip.get(i),getContext());
-                    EventRecyclerView.FacebookItemAdapter fbadapter = new EventRecyclerView.FacebookItemAdapter(getContext(), staticeventRecyclerView.getItemFacebook(),username);
+                    staticeventRecyclerView.initializeDataFacebook(neareventId.get(i),neareventList.get(i),neareventCategory.get(i),neareventLocation.get(i),neareventDate.get(i),neareventOrganizer.get(i),nearviewcount.get(i),nearlatitude.get(i),nearlongitude.get(i),neareventPath.get(i),neareventDescrip.get(i),getContext(),dist);
+                    EventRecyclerView.FacebookItemAdapter fbadapter = new EventRecyclerView.FacebookItemAdapter(getContext(), staticeventRecyclerView.getItemFacebook(),username,true);
                     mfbRecyclerView.setAdapter(fbadapter);
                 }else{
                     Log.i("NFBIndexRemove "+i," "+neareventList.get(i));
