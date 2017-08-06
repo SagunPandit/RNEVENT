@@ -165,6 +165,16 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                 searchintent.putExtra("username",username);
                 startActivity(searchintent);
                 break;
+
+            case R.id.action_invitation:
+                Bundle bundle = new Bundle();
+                bundle.putString("username", username);
+                Invite invite=new Invite();
+                android.support.v4.app.FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.fragment_container, invite);
+                invite.setArguments(bundle);
+                fragmentTransaction.commit();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
