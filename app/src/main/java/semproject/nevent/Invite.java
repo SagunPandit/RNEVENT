@@ -2,6 +2,9 @@ package semproject.nevent;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -42,6 +46,7 @@ public class Invite extends Fragment implements ConnectivityReceiver.Connectivit
     List<String>eventDate=new ArrayList<>();
     List<String>eventCategory=new ArrayList<>();
     List<String>eventOrganizer=new ArrayList<>();
+    List<String>invitedby=new ArrayList<>();
     List<Integer>viewcount=new ArrayList<>();
 
 
@@ -81,8 +86,8 @@ public class Invite extends Fragment implements ConnectivityReceiver.Connectivit
             for (int i=0;i < eventList.size();i++)
             {
                 Log.i("Value of element "+i,eventList.get(i));
-                staticeventRecyclerView.initializeData(eventId.get(i),eventList.get(i),eventCategory.get(i),eventLocation.get(i),eventDate.get(i),eventOrganizer.get(i),viewcount.get(i),context,0);
-                staticadapter = new EventRecyclerView.AllItemAdapter(context, staticeventRecyclerView.getItem(),username,false);
+                staticeventRecyclerView.initializeData(eventId.get(i),eventList.get(i),eventCategory.get(i),eventLocation.get(i),eventDate.get(i),eventOrganizer.get(i),viewcount.get(i),context,invitedby.get(i));
+                staticadapter = new EventRecyclerView.AllItemAdapter(context, staticeventRecyclerView.getItem(),username,false,true);
                 mRecyclerView.setAdapter(staticadapter);
             }
         }
@@ -137,6 +142,10 @@ public class Invite extends Fragment implements ConnectivityReceiver.Connectivit
                             //for eventorganizer
                             for (int i=0;i<len;i++){
                                 eventOrganizer.add(jsonArray5.get(i).toString());
+                            }
+                            //for invitedby
+                            for (int i=0;i<len;i++){
+                                invitedby.add(jsonArray8.get(i).toString());
                             }
                             //for count
                             for (int i=0;i<len;i++){

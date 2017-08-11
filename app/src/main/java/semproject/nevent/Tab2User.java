@@ -119,14 +119,14 @@ public class Tab2User extends Fragment {
         }
         if(searchItem.isEmpty()) {
             tab1recyclerview.emptyItems();
-            searchadapter = new EventRecyclerView.AllItemAdapter(getContext().getApplicationContext(), tab1recyclerview.getItem(),"Sagun",false);
+            searchadapter = new EventRecyclerView.AllItemAdapter(getContext().getApplicationContext(), tab1recyclerview.getItem(),"Sagun",false,false);
             Tab1Event.tab1mRecyclerView.setAdapter(searchadapter);
             Log.i("tab2Searched", "SearchItem is empty");
         }else {
             for (EventRecyclerView.Item indevent : searchItem) {
                 Log.i("tab2Searched Eventfl", indevent.eventLabel);
-                tab1recyclerview.initializeData(indevent.eventId,indevent.eventLabel,indevent.eventCategory,indevent.eventLocation ,indevent.eventDate ,indevent.eventOrganizer ,indevent.viewcount ,indevent.context,0);
-                searchadapter = new EventRecyclerView.AllItemAdapter(indevent.context.getApplicationContext(), tab1recyclerview.getItem(),"Sagun",false);
+                tab1recyclerview.initializeData(indevent.eventId,indevent.eventLabel,indevent.eventCategory,indevent.eventLocation ,indevent.eventDate ,indevent.eventOrganizer ,indevent.viewcount ,indevent.context,"");
+                searchadapter = new EventRecyclerView.AllItemAdapter(indevent.context.getApplicationContext(), tab1recyclerview.getItem(),"Sagun",false,false);
                 Tab1Event.tab1mRecyclerView.setAdapter(searchadapter);
                 Log.i("tab2Searched Event", indevent.eventLabel);
             }

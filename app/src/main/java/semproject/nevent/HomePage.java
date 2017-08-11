@@ -3,9 +3,13 @@ package semproject.nevent;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -16,6 +20,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -38,6 +43,7 @@ import semproject.nevent.Request.RecyclerRequest;
 
 public class HomePage extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,ConnectivityReceiver.ConnectivityReceiverListener{
     final String STRING_TAG= "HomePage";
+    private int count = 1;
     NavigationView navigationView=null;
     Toolbar toolbar=null;
     String username;
@@ -141,6 +147,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.homepage, menu);
+        MenuItem menuItem = menu.findItem(R.id.action_invitation);
+        menuItem.setIcon(buildCounterDrawable(count,  R.drawable.invites));
 /*        MenuItem menuItem=menu.findItem(R.id.action_search);
         SearchView searchView= (SearchView) MenuItemCompat.getActionView(menuItem);
         searchView.setOnQueryTextListener(this);*/
@@ -591,4 +599,30 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         }
     }
 
+
+    private Drawable buildCounterDrawable(int count, int backgroundImageId) {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View view = inflater.inflate(R.layout.counter_menuitem_layout, null);
+        view.setBackgroundResource(backgroundImageId);
+
+        if (count == 0) {
+            View counterTextPanel = view.findViewById(R.id.counterValuePanel);
+            counterTextPanel.setVisibility(View.GONE);
+        } else {
+            TextView textView = (TextView) view.findViewById(R.id.count);
+            textView.setText("" + count);
+        }
+
+        view.measure(
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+
+        view.setDrawingCacheEnabled(true);
+        view.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        Bitmap bitmap = Bitmap.createBitmap(view.getDrawingCache());
+        view.setDrawingCacheEnabled(false);
+
+        return new BitmapDrawable(getResources(), bitmap);
+    }
 }

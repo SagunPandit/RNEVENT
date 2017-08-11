@@ -459,7 +459,7 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
                 {
                     denoteempty.setVisibility(View.GONE);
                     Log.i("Value of element "+i,fbeventList.get(i));
-                    eventRecyclerView.initializeData(fbeventId.get(i),fbeventList.get(i),fbeventCategory.get(i),fbeventLocation.get(i),fbeventDate.get(i),username,fbviewcount.get(i),getContext(),0);
+                    eventRecyclerView.initializeData(fbeventId.get(i),fbeventList.get(i),fbeventCategory.get(i),fbeventLocation.get(i),fbeventDate.get(i),username,fbviewcount.get(i),getContext(),"");
                     RecyclerView.Adapter mAdapter = new EventRecyclerView.ItemAdapter(getContext(), eventRecyclerView.getItem(),username);
                     mRecyclerView.setAdapter(mAdapter);
                 }
@@ -467,7 +467,7 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
             else {
                 if (fbeventList.isEmpty()){
                     eventRecyclerView.emptyItems();
-                    RecyclerView.Adapter mAdapter = new EventRecyclerView.AllItemAdapter(getContext(), eventRecyclerView.getItem(),username,false);
+                    RecyclerView.Adapter mAdapter = new EventRecyclerView.AllItemAdapter(getContext(), eventRecyclerView.getItem(),username,false,false);
                     mRecyclerView.setAdapter(mAdapter);
                     denoteempty.setVisibility(View.VISIBLE);
                 }
@@ -475,8 +475,8 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
                 {
                     denoteempty.setVisibility(View.GONE);
                     Log.i("Value of element "+i,fbeventList.get(i));
-                    eventRecyclerView.initializeData(fbeventId.get(i),fbeventList.get(i),fbeventCategory.get(i),fbeventLocation.get(i),fbeventDate.get(i),username,fbviewcount.get(i),getContext(),0);
-                    RecyclerView.Adapter mAdapter = new EventRecyclerView.AllItemAdapter(getContext(), eventRecyclerView.getItem(),username,false);
+                    eventRecyclerView.initializeData(fbeventId.get(i),fbeventList.get(i),fbeventCategory.get(i),fbeventLocation.get(i),fbeventDate.get(i),username,fbviewcount.get(i),getContext(),"");
+                    RecyclerView.Adapter mAdapter = new EventRecyclerView.AllItemAdapter(getContext(), eventRecyclerView.getItem(),username,false,false);
                     mRecyclerView.setAdapter(mAdapter);
                 }
             }

@@ -69,7 +69,7 @@ public class EventRecyclerView {
 
     }
 
-    public void initializeData(String eventid,String eventname,String eventcategory,String eventlocation,String eventdate,String organizer,Integer viewcount,Context context,float distance) {
+    public void initializeData(String eventid,String eventname,String eventcategory,String eventlocation,String eventdate,String organizer,Integer viewcount,Context context,String distance) {
         items.add(new Item(eventid,eventname, eventcategory,eventlocation,eventdate,organizer,viewcount,context,distance));
         Log.e(STRING_TAG+"item",eventname+" data initialized");
         Log.e(STRING_TAG+"init",Integer.toString(items.size()));
@@ -120,9 +120,9 @@ public class EventRecyclerView {
         public String eventId,eventLocation,eventDate,eventOrganizer,eventCategory;
         public Context context;
         public int viewcount;
-        public float distance;
+        public String distance;
 
-        Item(String eventid,String eventname,String eventcategory,String eventlocation,String eventdate,String eventOrganizer,Integer count,Context context,float distance) {
+        Item(String eventid,String eventname,String eventcategory,String eventlocation,String eventdate,String eventOrganizer,Integer count,Context context,String distance) {
             this.eventId=eventid;
             this.eventLabel=eventname;
             this.eventLocation=eventlocation;
@@ -535,17 +535,19 @@ public class EventRecyclerView {
         Item currentItem;
         String username;
         boolean check=false;
+        boolean isInvite=false;
 
         public AllItemAdapter(){
            /* Log.e(STRING_TAG,Integer.toString(check));
             check++;*/
         }
         // Constructor to inflate layout of each item in RecyclerView
-        public AllItemAdapter(Context context, List<Item> items, String name, boolean check) {
+        public AllItemAdapter(Context context, List<Item> items, String name, boolean isNearlist, boolean isInvite) {
             inflater = LayoutInflater.from(context);
             this.items = items;
             username=name;
-            this.check=check;
+            this.check=isNearlist;
+            this.isInvite=isInvite;
            /* Log.e(STRING_TAG,"itemadpter "+Integer.toString(check));*/
 
         }
@@ -654,8 +656,16 @@ public class EventRecyclerView {
                 });
             }
             if(check){
-                String holderdistance=Float.toString(currentItem.distance);
-                holder.distancevalue.setText(holderdistance);
+                //String holderdistance=Float.toString(currentItem.distance);
+                holder.distancevalue.setText(currentItem.distance);
+                holder.distancetext.setVisibility(View.VISIBLE);
+                holder.distancevalue.setVisibility(View.VISIBLE);
+            }
+
+            if(isInvite){
+                //String holderdistance=Float.toString(currentItem.distance);
+                holder.distancevalue.setText(currentItem.distance);
+                holder.distancetext.setText("Invited by: ");
                 holder.distancetext.setVisibility(View.VISIBLE);
                 holder.distancevalue.setVisibility(View.VISIBLE);
             }

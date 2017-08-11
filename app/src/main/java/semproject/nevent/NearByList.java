@@ -138,8 +138,8 @@ public class NearByList extends Fragment implements ConnectivityReceiver.Connect
                     dist = ShowEvents.distance.get(i) / 1000;
                     DecimalFormat numberformat= new DecimalFormat("#.00");
                     dist=Float.parseFloat(numberformat.format(dist));
-                    staticeventRecyclerView.initializeData(neareventId.get(i),neareventList.get(i),neareventCategory.get(i),neareventLocation.get(i),neareventDate.get(i),neareventOrganizer.get(i),nearviewcount.get(i),getContext(),dist);
-                    EventRecyclerView.AllItemAdapter adapter = new EventRecyclerView.AllItemAdapter(getContext(), staticeventRecyclerView.getItem(),username,true);
+                    staticeventRecyclerView.initializeData(neareventId.get(i),neareventList.get(i),neareventCategory.get(i),neareventLocation.get(i),neareventDate.get(i),neareventOrganizer.get(i),nearviewcount.get(i),getContext(),Float.toString(dist));
+                    EventRecyclerView.AllItemAdapter adapter = new EventRecyclerView.AllItemAdapter(getContext(), staticeventRecyclerView.getItem(),username,true,false);
                     mRecyclerView.setAdapter(adapter);}
 
             }
