@@ -36,6 +36,7 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphRequestAsyncTask;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
@@ -71,19 +72,19 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
     SharedPreferences sharedpreferences;
     private RecyclerView mRecyclerView;
     String username;
-    public static List<String> fbeventList=new ArrayList<>();
-    public static List<String>fbeventLocation=new ArrayList<>();
-    public static List<String>fbeventDate=new ArrayList<>();
-    public static List<String>fbeventCategory=new ArrayList<>();
-    public static List<String>fbeventId=new ArrayList<>();
-    public static List<Integer>fbviewcount=new ArrayList<>();
+     List<String> eventList=new ArrayList<>();
+     List<String>eventLocation=new ArrayList<>();
+     List<String>eventDate=new ArrayList<>();
+     List<String>eventCategory=new ArrayList<>();
+    List<String>eventId=new ArrayList<>();
+     List<Integer>viewcount=new ArrayList<>();
 
     //for page events
-    public static List<String>fbevent_org=new ArrayList<>();
-    public static List<String>fbevent_descrp=new ArrayList<>();
-    public static List<String>fbevent_picpath=new ArrayList<>();
-    public static List<Double>fblatitude=new ArrayList<>();
-    public static List<Double>fblongitude=new ArrayList<>();
+     List<String>event_org=new ArrayList<>();
+     List<String>event_descrp=new ArrayList<>();
+     List<String>event_picpath=new ArrayList<>();
+     List<Double>latitude=new ArrayList<>();
+     List<Double>longitude=new ArrayList<>();
     int start=0;
 
     TextView denoteempty;
@@ -91,7 +92,6 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
     private LoginButton loginButton;
     private CallbackManager callbackManager;
     AccessTokenTracker accessTokenTracker;
-    Button fbbutton;
     EventRecyclerView eventRecyclerView;
 
     public Userdetail(){}
@@ -154,53 +154,11 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
                     SharedPreferences.Editor editor = sharedpreferences.edit();
                     editor.clear();
                     editor.apply();
+                    LoginManager.getInstance().logOut();
                     Intent intent= new Intent(getContext(),MainActivity.class);
                     getActivity().finish();
                     startActivity(intent);
                 }
-            }
-        });
-        fbbutton=(Button) rootView.findViewById(R.id.fbbutton);
-        fbbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fbeventLocation.clear();
-                fbeventList.clear();//name
-                fbeventId.clear();
-                fbeventDate.clear();
-                fbeventCategory.clear();
-                fbviewcount.clear();
-                fbevent_org.clear();
-                start=0;
-                eventRecyclerView = new EventRecyclerView();
-                GraphRequest request = GraphRequest.newMeRequest(
-                        AccessToken.getCurrentAccessToken(),
-                        new GraphRequest.GraphJSONObjectCallback() {
-                            @Override
-                            public void onCompleted(JSONObject object, GraphResponse response) {
-                                try {
-                                    JSONArray posts = object.getJSONObject("likes").optJSONArray("data");
-                                    /*String proname= object.getString("name");
-                                    Log.e("Profile name",proname);*/
-                                    for (int i = 0; i<posts.length(); i++) {
-                                        JSONObject post = posts.optJSONObject(i);
-                                        String id = post.optString("id");
-                                        String pagecategory = post.optString("category");
-                                        String pagename = post.optString("name");
-                                        eventsofpage(id,AccessToken.getCurrentAccessToken(),pagename);
-                                        //int count = post.optInt("likes");
-                                        // print id, page name and number of like of facebook page
-                                        //Log.e("Facebook","id "+ id+ "name "+name+ " category"+ category );
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
-                Bundle parameters = new Bundle();//contains details to be extracted
-                parameters.putString("fields", "likes{id,name,category}");
-                request.setParameters(parameters);
-                request.executeAsync();
             }
         });
         accessTokenTracker = new AccessTokenTracker() {
@@ -209,7 +167,6 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
                 updateWithToken(newAccessToken);
             }
         };
-        updateWithToken(AccessToken.getCurrentAccessToken());
 
 
 
@@ -226,47 +183,6 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
                 TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
                 if (v != null) v.setGravity(Gravity.CENTER);
                 toast.show();
-
-                /*GraphRequest request = GraphRequest.newMeRequest(
-                        loginResult.getAccessToken(),
-                        new GraphRequest.GraphJSONObjectCallback() {
-
-                            @Override
-                            public void onCompleted(JSONObject object, GraphResponse response) {
-                                try {
-                                    JSONArray posts = object.getJSONObject("likes").optJSONArray("data");
-                                    String proname= object.getString("name");
-
-                                    Log.e("Profile name",proname);
-                                    for (int i = 0; i<posts.length(); i++) {
-                                        JSONObject post = posts.optJSONObject(i);
-                                        String id = post.optString("id");
-                                        eventsofpage(id,loginResult.getAccessToken());
-                                        String category = post.optString("category");
-                                        String name = post.optString("name");
-                                        //int count = post.optInt("likes");
-                                        // print id, page name and number of like of facebook page
-                                        Log.e("Facebook","id "+ id+ "name "+name+ " category"+ category );
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
-                Bundle parameters = new Bundle();//contains details to be extracted
-                parameters.putString("fields", "id,name,email,gender, birthday,likes{id,name,category}");
-                request.setParameters(parameters);
-                request.executeAsync();*/
-
-
-               /* GraphRequestAsyncTask eventrequest= new GraphRequest(loginResult.getAccessToken(),"/{page-id}/events",null,
-                        HttpMethod.GET,
-                        new GraphRequest.Callback() {
-                            public void onCompleted(GraphResponse response) {
-                                *//* handle the result *//*
-                            }
-                        }
-                ).executeAsync();*/
             }
 
             @Override
@@ -308,174 +224,49 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
 
     private void updateWithToken(AccessToken currentAccessToken) {
         if(currentAccessToken!=null){
-            fbbutton.setVisibility(View.VISIBLE);
+            //fbbutton.setVisibility(View.VISIBLE);
             Log.e("Facebook","Loggedin");
 
         }
         else{
-            eventRecyclerView.emptyItemsFacebook();
-            RecyclerView.Adapter mAdapter = new EventRecyclerView.FacebookItemAdapter(getContext(), eventRecyclerView.getItemFacebook(), username,false);
-            mRecyclerView.setAdapter(mAdapter);
-            fbbutton.setVisibility(View.GONE);
             Log.e("Facebook","Not logged in");
         }
     }
 
-    public void eventsofpage(String id, AccessToken accessToken,final String pagename){
-        String path="/"+id+"/events";
-        Bundle parameters = new Bundle();//contains details to be extracted
-        parameters.putString("fields", "name,attending_count,start_time,cover{source},category,description,place{name,location{latitude,longitude,city}}");
-        GraphRequestAsyncTask eventrequest= new GraphRequest(accessToken,path,parameters,
-                HttpMethod.GET,
-                new GraphRequest.Callback() {
-                    public void onCompleted(GraphResponse response) {
-                        JSONObject graphResponse = response.getJSONObject();
-                        String postId = null;
-                        try {
-                            JSONArray eventsJSON= graphResponse.getJSONArray("data");
-                            for (int i = 0; i<eventsJSON.length(); i++) {
-                                fbevent_org.add(pagename);
-                                Log.e("FacebookEvents","insidefun4");
-                                JSONObject indiv = eventsJSON.optJSONObject(i);
-                                int event_id;
-                                try{
-                                    event_id=indiv.getInt("id");
-                                }
-                                catch(Exception e){
-                                    event_id=0;
-                                }
-                                fbeventId.add(Integer.toString(event_id));
-                                Log.e("FacebookEvents","id "+ event_id);
-
-                                String event_name;
-                                try{
-                                    event_name = indiv.optString("name");}
-                                catch(Exception e){
-                                    event_name="";
-                                }
-                                fbeventList.add(event_name);
-                                Log.e("FacebookEvents","name "+ event_name);
-
-                                //place{name,location{latitude,longitude,city}}
-                                String location_name;
-                                JSONObject place=null;
-                                try{
-                                    place= indiv.getJSONObject("place");
-                                    location_name= place.getString("name");}
-                                catch (Exception e){
-                                    location_name=" ";
-                                }
-                                fbeventLocation.add(location_name);
-                                Log.e("FacebookEvents", " location: " + location_name);
-
-                                Double lat,longi;
-                                try {
-                                    JSONObject location = place.getJSONObject("location");
-                                    lat = location.getDouble("latitude");
-                                    longi = location.getDouble("longitude");
-                                }
-                                catch (Exception e){
-                                    longi=0.0;
-                                    lat=0.0;
-                                }
-                                fblatitude.add(lat);
-                                fblongitude.add(longi);
-                                Log.e("FacebookEvents", "lat " + Double.toString(lat));
-                                Log.e("FacebookEvents", "log " + Double.toString(longi));
-
-                                int count_view;
-                                try {
-                                    count_view = indiv.getInt("attending_count");
-                                }catch (Exception e){
-                                    count_view=0;
-                                }
-                                fbviewcount.add(count_view);
-                                Log.e("FacebookEvents", "view " + Integer.toString(count_view));
-
-                                String date;
-                                try {
-                                    String[] slipted;
-                                    date = indiv.getString("start_time");
-                                    slipted=date.split("T");
-                                    date= slipted[0];
-                                }catch (Exception e){
-                                    date=" ";
-                                }
-                                fbeventDate.add(date);
-                                Log.e("FacebookEvents","date "+date);
-
-                                String category;
-                                try{
-                                    category=indiv.getString("category");
-                                }catch (Exception e){
-                                    category="Other";
-                                }
-                                fbeventCategory.add(category);
-                                Log.e("FacebookEvents","category "+category);
-
-                                String description;
-                                try{
-                                    description = indiv.getString("description");
-                                }catch (Exception e){
-                                    description=" ";
-                                }
-                                fbevent_descrp.add(description);
-
-                                String picpath;
-                                try {
-                                    JSONObject coverpic = indiv.getJSONObject("cover");
-                                    picpath = coverpic.getString("source");
-                                }catch (Exception e){
-                                    picpath=" ";
-                                }
-                                fbevent_picpath.add(picpath);
-                                Log.e("FacebookEvents",picpath);
-                            }
-                            addforFacebook();
-                            Log.e("FacebookEvents","end.............");
-                        } catch (JSONException e) {
-                            Log.i("Facebook error", "JSON error " + e.getMessage());
-                        }
-                    }
-                }
-        ).executeAsync();
-
-
-    }
 
     public void retreiveFromDatabase(boolean ownEvents){
         Log.e(STRING_TAG,"database");
-        Log.e(STRING_TAG, Integer.toString(fbeventList.size()));
+        Log.e(STRING_TAG, Integer.toString(eventList.size()));
         EventRecyclerView eventRecyclerView = new EventRecyclerView();
         if(checkConnection(getContext())){
             if(ownEvents){
-                if (fbeventList.isEmpty()){
+                if ( eventList.isEmpty()){
                     eventRecyclerView.emptyItems();
                     RecyclerView.Adapter mAdapter = new EventRecyclerView.ItemAdapter(getContext(), eventRecyclerView.getItem(),username);
                     mRecyclerView.setAdapter(mAdapter);
                     denoteempty.setVisibility(View.VISIBLE);
                 }
-                for (int i=0;i < fbeventList.size();i++)
+                for (int i=0;i <  eventList.size();i++)
                 {
                     denoteempty.setVisibility(View.GONE);
-                    Log.i("Value of element "+i,fbeventList.get(i));
-                    eventRecyclerView.initializeData(fbeventId.get(i),fbeventList.get(i),fbeventCategory.get(i),fbeventLocation.get(i),fbeventDate.get(i),username,fbviewcount.get(i),getContext(),"");
+                    Log.i("Value of element "+i, eventList.get(i));
+                    eventRecyclerView.initializeData( eventId.get(i), eventList.get(i), eventCategory.get(i), eventLocation.get(i), eventDate.get(i),username, viewcount.get(i),getContext(),"");
                     RecyclerView.Adapter mAdapter = new EventRecyclerView.ItemAdapter(getContext(), eventRecyclerView.getItem(),username);
                     mRecyclerView.setAdapter(mAdapter);
                 }
             }
             else {
-                if (fbeventList.isEmpty()){
+                if ( eventList.isEmpty()){
                     eventRecyclerView.emptyItems();
                     RecyclerView.Adapter mAdapter = new EventRecyclerView.AllItemAdapter(getContext(), eventRecyclerView.getItem(),username,false,false);
                     mRecyclerView.setAdapter(mAdapter);
                     denoteempty.setVisibility(View.VISIBLE);
                 }
-                for (int i=0;i < fbeventList.size();i++)
+                for (int i=0;i <  eventList.size();i++)
                 {
                     denoteempty.setVisibility(View.GONE);
-                    Log.i("Value of element "+i,fbeventList.get(i));
-                    eventRecyclerView.initializeData(fbeventId.get(i),fbeventList.get(i),fbeventCategory.get(i),fbeventLocation.get(i),fbeventDate.get(i),username,fbviewcount.get(i),getContext(),"");
+                    Log.i("Value of element "+i, eventList.get(i));
+                    eventRecyclerView.initializeData( eventId.get(i), eventList.get(i), eventCategory.get(i), eventLocation.get(i), eventDate.get(i),username, viewcount.get(i),getContext(),"");
                     RecyclerView.Adapter mAdapter = new EventRecyclerView.AllItemAdapter(getContext(), eventRecyclerView.getItem(),username,false,false);
                     mRecyclerView.setAdapter(mAdapter);
                 }
@@ -485,46 +276,14 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
 
     }
 
-    public void addforFacebook(){
-        if(checkConnection(getActivity())) {
-            if (fbeventList.isEmpty()) {
-                eventRecyclerView.emptyItemsFacebook();
-                RecyclerView.Adapter mAdapter = new EventRecyclerView.FacebookItemAdapter(getContext(), eventRecyclerView.getItemFacebook(), username,false);
-                mRecyclerView.setAdapter(mAdapter);
-                denoteempty.setVisibility(View.VISIBLE);
-            }
-            else {
-                Log.i("TValue start.... ",Integer.toString(fbeventList.size()));
-                for (int i=start ; i < fbeventList.size(); i++) {
-                    start++;
-                    denoteempty.setVisibility(View.GONE);
-                    Log.i("FValue element " + i, fbeventId.get(i));
-                    Log.i("FValue element " + i, fbeventList.get(i));
-                    Log.i("FValue element " + i, fbeventCategory.get(i));
-                    Log.i("FValue element " + i, fbeventLocation.get(i));
-                    Log.i("FValue element " + i, fbeventDate.get(i));
-                    Log.i("FValue element " + i, fbevent_org.get(i));
-                    Log.i("FValue element " + i, Integer.toString(fbviewcount.get(i)));
-                    Log.i("FValue element " + i, Double.toString(fblatitude.get(i)));
-                    Log.i("FValue element " + i, Double.toString(fblongitude.get(i)));
-                    Log.i("FValue element " + i, fbevent_picpath.get(i));
-
-                    eventRecyclerView.initializeDataFacebook(fbeventId.get(i), fbeventList.get(i), fbeventCategory.get(i), fbeventLocation.get(i), fbeventDate.get(i),
-                            fbevent_org.get(i), fbviewcount.get(i), fblatitude.get(i), fblongitude.get(i), fbevent_picpath.get(i), fbevent_descrp.get(i), getContext(),0);
-                    RecyclerView.Adapter mAdapter = new EventRecyclerView.FacebookItemAdapter(getContext(), eventRecyclerView.getItemFacebook(), username,false);
-                    mRecyclerView.setAdapter(mAdapter);
-                }
-            }
-        }
-    }
 
     public void userListener(final boolean ownEvents){
         Log.e(STRING_TAG,"insideListiner");
-        fbeventLocation.clear();
-        fbeventList.clear();
-        fbeventId.clear();
-        fbeventCategory.clear();
-        fbviewcount.clear();
+         eventLocation.clear();
+         eventList.clear();
+         eventId.clear();
+         eventCategory.clear();
+         viewcount.clear();
         Response.Listener<String> responseListener= new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -549,33 +308,33 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
                             Log.e(STRING_TAG + "len",Integer.toString(len));
                             //for eventid
                             for (int i=0;i<len;i++){
-                                fbeventId.add(jsonArray5.get(i).toString());
+                                 eventId.add(jsonArray5.get(i).toString());
                             }
 
                             //for eventname
                             for (int i=0;i<len;i++){
-                                fbeventList.add(jsonArray.get(i).toString());
+                                 eventList.add(jsonArray.get(i).toString());
                             }
 
                             //for eventlocation
                             for (int i=0;i<len;i++){
-                                fbeventLocation.add(jsonArray2.get(i).toString());
+                                 eventLocation.add(jsonArray2.get(i).toString());
                             }
 
                             //for eventdate
                             for (int i=0;i<len;i++){
-                                fbeventDate.add(jsonArray3.get(i).toString());
+                                 eventDate.add(jsonArray3.get(i).toString());
                             }
 
                             //for eventcategory
                             for (int i=0;i<len;i++){
-                                fbeventCategory.add(jsonArray4.get(i).toString());
+                                 eventCategory.add(jsonArray4.get(i).toString());
                             }
 
                             //for count
                             for (int i=0;i<len;i++){
                                 int value=(Integer) jsonArray7.get(i);
-                                fbviewcount.add(value);
+                                 viewcount.add(value);
                             }
                             retreiveFromDatabase(ownEvents);
                         }

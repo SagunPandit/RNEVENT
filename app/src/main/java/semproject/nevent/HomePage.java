@@ -27,6 +27,7 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
+import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
 
 import org.json.JSONArray;
@@ -67,10 +68,13 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
     List<String>invite_useremail=new ArrayList<>();
 
     AccessTokenTracker accessTokenTracker;
+    private CallbackManager callbackManager;
+    MenuItem fb_icon;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        callbackManager = CallbackManager.Factory.create();
         FacebookSdk.sdkInitialize(this.getApplicationContext());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
@@ -91,7 +95,6 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                 updateWithToken(newAccessToken);
             }
         };
-        updateWithToken(AccessToken.getCurrentAccessToken());
 
         listenerFunction(username,search_userid,search_username,search_useremail,true);
         if (id==1)
@@ -149,6 +152,8 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
         getMenuInflater().inflate(R.menu.homepage, menu);
         MenuItem menuItem = menu.findItem(R.id.action_invitation);
         menuItem.setIcon(buildCounterDrawable(count,  R.drawable.invites));
+        fb_icon=menu.findItem(R.id.action_facebook);
+        updateWithToken(AccessToken.getCurrentAccessToken());
 /*        MenuItem menuItem=menu.findItem(R.id.action_search);
         SearchView searchView= (SearchView) MenuItemCompat.getActionView(menuItem);
         searchView.setOnQueryTextListener(this);*/
@@ -157,6 +162,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        android.support.v4.app.FragmentTransaction fragmentTransaction;
         switch (item.getItemId()){
             case R.id.action_location:
                 ShowEvents showEvents=new ShowEvents();
@@ -175,12 +181,23 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                 break;
 
             case R.id.action_invitation:
-                Bundle bundle = new Bundle();
+                Bundle bundle=new Bundle();
                 bundle.putString("username", username);
                 Invite invite=new Invite();
-                android.support.v4.app.FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
+                fragmentTransaction=getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.fragment_container, invite);
                 invite.setArguments(bundle);
+                fragmentTransaction.commit();
+                break;
+
+            case R.id.action_facebook:
+                Bundle bundlefb=new Bundle();
+                Log.e("HOMEPAGE","facebookclicked");
+                bundlefb.putString("username", username);
+                FacebookEvents facebookEvents=new FacebookEvents();
+                fragmentTransaction=getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.fragment_container, facebookEvents);
+                facebookEvents.setArguments(bundlefb);
                 fragmentTransaction.commit();
                 break;
         }
@@ -350,9 +367,11 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
 
     private void updateWithToken(AccessToken currentAccessToken) {
         if(currentAccessToken!=null){
+            fb_icon.setVisible(true);
             Log.e("Facebook","Loggedin");
         }
         else{
+            fb_icon.setVisible(false);
             Log.e("Facebook","Not logged in");
         }
     }

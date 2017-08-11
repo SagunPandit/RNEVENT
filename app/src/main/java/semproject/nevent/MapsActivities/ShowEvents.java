@@ -54,9 +54,9 @@ import static semproject.nevent.Recent.extractlatitude;
 import static semproject.nevent.Recent.extractlongitude;
 import static semproject.nevent.Recent.latitude;
 import static semproject.nevent.Recent.longitude;
-import static semproject.nevent.Userdetail.fbeventList;
-import static semproject.nevent.Userdetail.fblatitude;
-import static semproject.nevent.Userdetail.fblongitude;
+import static semproject.nevent.FacebookEvents.fbeventList;
+import static semproject.nevent.FacebookEvents.fblatitude;
+import static semproject.nevent.FacebookEvents.fblongitude;
 
 public class ShowEvents extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 

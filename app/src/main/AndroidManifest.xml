@@ -93,7 +93,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".SearchResultActivity"
-            android:label="@string/title_activity_search_result"
+            android:label="Search"
             android:parentActivityName=".HomePage"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <meta-data

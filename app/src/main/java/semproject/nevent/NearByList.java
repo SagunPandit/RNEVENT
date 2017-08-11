@@ -34,17 +34,17 @@ import static semproject.nevent.Recent.extracteventOrganizer;
 import static semproject.nevent.Recent.extractlatitude;
 import static semproject.nevent.Recent.extractlongitude;
 import static semproject.nevent.Recent.extractviewcount;
-import static semproject.nevent.Userdetail.fbeventCategory;
-import static semproject.nevent.Userdetail.fbeventDate;
-import static semproject.nevent.Userdetail.fbeventId;
-import static semproject.nevent.Userdetail.fbeventList;
-import static semproject.nevent.Userdetail.fbeventLocation;
-import static semproject.nevent.Userdetail.fbevent_descrp;
-import static semproject.nevent.Userdetail.fbevent_org;
-import static semproject.nevent.Userdetail.fbevent_picpath;
-import static semproject.nevent.Userdetail.fblatitude;
-import static semproject.nevent.Userdetail.fblongitude;
-import static semproject.nevent.Userdetail.fbviewcount;
+import static semproject.nevent.FacebookEvents.fbeventCategory;
+import static semproject.nevent.FacebookEvents.fbeventDate;
+import static semproject.nevent.FacebookEvents.fbeventId;
+import static semproject.nevent.FacebookEvents.fbeventList;
+import static semproject.nevent.FacebookEvents.fbeventLocation;
+import static semproject.nevent.FacebookEvents.fbevent_descrp;
+import static semproject.nevent.FacebookEvents.fbevent_org;
+import static semproject.nevent.FacebookEvents.fbevent_picpath;
+import static semproject.nevent.FacebookEvents.fblatitude;
+import static semproject.nevent.FacebookEvents.fblongitude;
+import static semproject.nevent.FacebookEvents.fbviewcount;
 
 
 /**

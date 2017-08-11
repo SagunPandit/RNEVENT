@@ -107,7 +107,39 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="id"
-                        android:textSize="1sp"
+                        android:textSize="0sp"
+                        android:textColor="#008000"
+                        android:visibility="invisible"/>
+                    <TextView
+                        android:id="@+id/fbeventPath"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="id"
+                        android:textSize="0sp"
+                        android:textColor="#008000"
+                        android:visibility="invisible"/>
+                    <TextView
+                        android:id="@+id/fbeventLong"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="id"
+                        android:textSize="0sp"
+                        android:textColor="#008000"
+                        android:visibility="invisible"/>
+                    <TextView
+                        android:id="@+id/fbeventLat"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="id"
+                        android:textSize="0sp"
+                        android:textColor="#008000"
+                        android:visibility="invisible"/>
+                    <TextView
+                        android:id="@+id/fbeventDesc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="id"
+                        android:textSize="0sp"
                         android:textColor="#008000"
                         android:visibility="invisible"/>
                     <TextView
@@ -115,7 +147,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="views"
-                        android:textSize="1sp"
+                        android:textSize="0sp"
                         android:textColor="#008000"
                         android:visibility="invisible"/>
                     </LinearLayout>

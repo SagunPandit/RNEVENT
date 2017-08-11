@@ -1138,6 +1138,11 @@ public class EventRecyclerView {
             holder.eventOrganizer.setText(currentItem.eventOrganizer);
             holder.eventId.setText(currentItem.eventId);
             holder.eventDelete.setVisibility(View.GONE);
+            holder.fbeventpath.setText(currentItem.picpath);
+            holder.longitude.setText(String.valueOf(currentItem.longitude));
+            holder.latitude.setText(String.valueOf(currentItem.latitude));
+            holder.description.setText(currentItem.description);
+            holder.eventView.setText(String.valueOf(currentItem.viewcount));
             if(isfornearby){
                 String holderdistance=Float.toString(currentItem.distance);
                 holder.distancevalue.setText(holderdistance);
@@ -1155,11 +1160,11 @@ public class EventRecyclerView {
                         intent.putExtra("eventDate",holder.eventDate.getText().toString());
                         intent.putExtra("eventCategory",holder.eventCategory.getText().toString());
                         intent.putExtra("eventOrganizer",holder.eventOrganizer.getText().toString());
-                        intent.putExtra("latitude",Double.toString(currentItem.latitude));
-                        intent.putExtra("longitude",Double.toString(currentItem.longitude));
-                        intent.putExtra("path",currentItem.picpath);
-                        intent.putExtra("description",currentItem.description);
-                        intent.putExtra("attendingcount",Integer.toString(currentItem.viewcount));
+                        intent.putExtra("latitude",holder.latitude.getText().toString());
+                        intent.putExtra("longitude",holder.longitude.getText().toString());
+                        intent.putExtra("path",holder.fbeventpath.getText().toString());
+                        intent.putExtra("description",holder.description.getText().toString());
+                        intent.putExtra("attendingcount",holder.eventView.getText().toString());
                         intent.putExtra("username",username);
                         /*try{
                         intent.putExtra("eventImage", ((BitmapDrawable)holder.downloadedimage.getDrawable()).getBitmap());}
@@ -1194,6 +1199,10 @@ public class EventRecyclerView {
             TextView eventView;
             TextView distancetext;
             TextView distancevalue;
+            TextView fbeventpath;
+            TextView longitude;
+            TextView latitude;
+            TextView description;
 
             public FacebookViewHolder(View itemView) {
                 super(itemView);
@@ -1209,6 +1218,10 @@ public class EventRecyclerView {
                 downloadedimage=(ImageView) itemView.findViewById(R.id.alldownloadedimage);
                 distancetext=(TextView) itemView.findViewById(R.id.distanceid);
                 distancevalue=(TextView) itemView.findViewById(R.id.distancevalue);
+                fbeventpath=(TextView) itemView.findViewById(R.id.fbeventPath);
+                longitude=(TextView) itemView.findViewById(R.id.fbeventLong);
+                latitude=(TextView) itemView.findViewById(R.id.fbeventLat);
+                description=(TextView) itemView.findViewById(R.id.fbeventDesc);
             }
         }
 
