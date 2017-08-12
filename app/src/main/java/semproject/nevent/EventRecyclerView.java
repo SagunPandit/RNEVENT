@@ -69,7 +69,7 @@ public class EventRecyclerView {
 
     }
 
-    public void initializeData(String eventid,String eventname,String eventcategory,String eventlocation,String eventdate,String organizer,Integer viewcount,Context context,float distance) {
+    public void initializeData(String eventid,String eventname,String eventcategory,String eventlocation,String eventdate,String organizer,Integer viewcount,Context context,String distance) {
         items.add(new Item(eventid,eventname, eventcategory,eventlocation,eventdate,organizer,viewcount,context,distance));
         Log.e(STRING_TAG+"item",eventname+" data initialized");
         Log.e(STRING_TAG+"init",Integer.toString(items.size()));
@@ -82,9 +82,9 @@ public class EventRecyclerView {
         Log.e(STRING_TAG+"init",Integer.toString(items_follow.size()));
     }
 
-    public void initializeDataFacebook(String eventid,String eventname,String eventcategory,String eventlocation,String eventdate,String eventOrganizer,Integer count,Double lat, Double longi, String path,String description,Context context) {
+    public void initializeDataFacebook(String eventid,String eventname,String eventcategory,String eventlocation,String eventdate,String eventOrganizer,Integer count,Double lat, Double longi, String path,String description,Context context,float distance) {
         try{
-            items_facebook.add(new Item_facebook(eventid,eventname,eventcategory,eventlocation,eventdate,eventOrganizer,count,lat,longi,path,description,context));
+            items_facebook.add(new Item_facebook(eventid,eventname,eventcategory,eventlocation,eventdate,eventOrganizer,count,lat,longi,path,description,context,distance));
             Log.e(STRING_TAG+"fb",eventname+" facebook data initialized");
             Log.e(STRING_TAG+"init",Integer.toString(items_facebook.size()));
         }catch (Exception e){
@@ -120,9 +120,9 @@ public class EventRecyclerView {
         public String eventId,eventLocation,eventDate,eventOrganizer,eventCategory;
         public Context context;
         public int viewcount;
-        public float distance;
+        public String distance;
 
-        Item(String eventid,String eventname,String eventcategory,String eventlocation,String eventdate,String eventOrganizer,Integer count,Context context,float distance) {
+        Item(String eventid,String eventname,String eventcategory,String eventlocation,String eventdate,String eventOrganizer,Integer count,Context context,String distance) {
             this.eventId=eventid;
             this.eventLabel=eventname;
             this.eventLocation=eventlocation;
@@ -160,8 +160,9 @@ public class EventRecyclerView {
         public Double longitude;
         public String picpath;
         public String description;
+        public Float distance;
 
-        Item_facebook(String eventid,String eventname,String eventcategory,String eventlocation,String eventdate,String eventOrganizer,Integer count,Double lat, Double longi, String path,String description,Context context) {
+        Item_facebook(String eventid,String eventname,String eventcategory,String eventlocation,String eventdate,String eventOrganizer,Integer count,Double lat, Double longi, String path,String description,Context context,float distance) {
             this.eventId=eventid;
             this.eventLabel=eventname;
             this.eventLocation=eventlocation;
@@ -170,6 +171,7 @@ public class EventRecyclerView {
             this.eventCategory=eventcategory;
             this.context=context;
             this.description=description;
+            this.distance=distance;
             latitude=lat;
             longitude=longi;
             picpath=path;
@@ -533,17 +535,19 @@ public class EventRecyclerView {
         Item currentItem;
         String username;
         boolean check=false;
+        boolean isInvite=false;
 
         public AllItemAdapter(){
            /* Log.e(STRING_TAG,Integer.toString(check));
             check++;*/
         }
         // Constructor to inflate layout of each item in RecyclerView
-        public AllItemAdapter(Context context, List<Item> items, String name, boolean check) {
+        public AllItemAdapter(Context context, List<Item> items, String name, boolean isNearlist, boolean isInvite) {
             inflater = LayoutInflater.from(context);
             this.items = items;
             username=name;
-            this.check=check;
+            this.check=isNearlist;
+            this.isInvite=isInvite;
            /* Log.e(STRING_TAG,"itemadpter "+Integer.toString(check));*/
 
         }
@@ -652,8 +656,16 @@ public class EventRecyclerView {
                 });
             }
             if(check){
-                String holderdistance=Float.toString(currentItem.distance);
-                holder.distancevalue.setText(holderdistance);
+                //String holderdistance=Float.toString(currentItem.distance);
+                holder.distancevalue.setText(currentItem.distance);
+                holder.distancetext.setVisibility(View.VISIBLE);
+                holder.distancevalue.setVisibility(View.VISIBLE);
+            }
+
+            if(isInvite){
+                //String holderdistance=Float.toString(currentItem.distance);
+                holder.distancevalue.setText(currentItem.distance);
+                holder.distancetext.setText("Invited by: ");
                 holder.distancetext.setVisibility(View.VISIBLE);
                 holder.distancevalue.setVisibility(View.VISIBLE);
             }
@@ -1061,6 +1073,7 @@ public class EventRecyclerView {
 
         String STRING_TAG= "FacebookItemAdapter";
         String username;
+        Boolean isfornearby;
         /* private instance variable to store Layout of each item. */
         private LayoutInflater inflater;
         /* Store data */
@@ -1092,17 +1105,18 @@ public class EventRecyclerView {
         }
 
         // Constructor to inflate layout of each item in RecyclerView
-        public FacebookItemAdapter(Context context, List<Item_facebook> items,String name) {
+        public FacebookItemAdapter(Context context, List<Item_facebook> items,String name,Boolean isfornearby) {
             inflater = LayoutInflater.from(context);
             this.items = items;
             this.username =name;
+            this.isfornearby=isfornearby;
         }
 
         //create a view holder of items
         @Override
         public FacebookViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             Log.v(LOG_TAG, "onCreateViewHolder called.");
-            View view = inflater.inflate(R.layout.events_details, parent, false);
+            View view = inflater.inflate(R.layout.allevents_details, parent, false);
 
             FacebookViewHolder holder = new FacebookViewHolder(view);
 
@@ -1124,6 +1138,17 @@ public class EventRecyclerView {
             holder.eventOrganizer.setText(currentItem.eventOrganizer);
             holder.eventId.setText(currentItem.eventId);
             holder.eventDelete.setVisibility(View.GONE);
+            holder.fbeventpath.setText(currentItem.picpath);
+            holder.longitude.setText(String.valueOf(currentItem.longitude));
+            holder.latitude.setText(String.valueOf(currentItem.latitude));
+            holder.description.setText(currentItem.description);
+            holder.eventView.setText(String.valueOf(currentItem.viewcount));
+            if(isfornearby){
+                String holderdistance=Float.toString(currentItem.distance);
+                holder.distancevalue.setText(holderdistance);
+                holder.distancetext.setVisibility(View.VISIBLE);
+                holder.distancevalue.setVisibility(View.VISIBLE);
+            }
             holder.eventLinear.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -1135,10 +1160,11 @@ public class EventRecyclerView {
                         intent.putExtra("eventDate",holder.eventDate.getText().toString());
                         intent.putExtra("eventCategory",holder.eventCategory.getText().toString());
                         intent.putExtra("eventOrganizer",holder.eventOrganizer.getText().toString());
-                        intent.putExtra("latitude",Double.toString(currentItem.latitude));
-                        intent.putExtra("longitude",Double.toString(currentItem.longitude));
-                        intent.putExtra("path",currentItem.picpath);
-                        intent.putExtra("description",currentItem.description);
+                        intent.putExtra("latitude",holder.latitude.getText().toString());
+                        intent.putExtra("longitude",holder.longitude.getText().toString());
+                        intent.putExtra("path",holder.fbeventpath.getText().toString());
+                        intent.putExtra("description",holder.description.getText().toString());
+                        intent.putExtra("attendingcount",holder.eventView.getText().toString());
                         intent.putExtra("username",username);
                         /*try{
                         intent.putExtra("eventImage", ((BitmapDrawable)holder.downloadedimage.getDrawable()).getBitmap());}
@@ -1170,18 +1196,32 @@ public class EventRecyclerView {
             TextView eventCategory;
             ImageView downloadedimage;
             TextView eventId;
+            TextView eventView;
+            TextView distancetext;
+            TextView distancevalue;
+            TextView fbeventpath;
+            TextView longitude;
+            TextView latitude;
+            TextView description;
 
             public FacebookViewHolder(View itemView) {
                 super(itemView);
-                eventLinear=(LinearLayout) itemView.findViewById(R.id.linear1);
-                eventId=(TextView) itemView.findViewById(R.id.eventId);
-                eventCategory=(TextView) itemView.findViewById(R.id.eventCategory);
-                eventLabel = (TextView) itemView.findViewById(R.id.eventLabel);
-                eventLocation = (TextView) itemView.findViewById(R.id.eventLocation);
-                eventDate=(TextView) itemView.findViewById(R.id.eventDate);
-                eventOrganizer=(TextView) itemView.findViewById(R.id.eventOrganizer);
-                eventDelete=(ImageButton) itemView.findViewById(R.id.eventDelete);
-                downloadedimage=(ImageView) itemView.findViewById(R.id.downloadedpicture);
+                eventLinear=(LinearLayout) itemView.findViewById(R.id.alllinear1);
+                eventId=(TextView) itemView.findViewById(R.id.alleventId);
+                eventCategory=(TextView) itemView.findViewById(R.id.alleventCategory);
+                eventLabel = (TextView) itemView.findViewById(R.id.alleventLabel);
+                eventLocation = (TextView) itemView.findViewById(R.id.alleventLocation);
+                eventDate=(TextView) itemView.findViewById(R.id.alleventDate);
+                eventOrganizer=(TextView) itemView.findViewById(R.id.alleventOrganizer);
+                eventView= (TextView) itemView.findViewById(R.id.alleventView);
+                eventDelete=(ImageButton) itemView.findViewById(R.id.alleventDelete);
+                downloadedimage=(ImageView) itemView.findViewById(R.id.alldownloadedimage);
+                distancetext=(TextView) itemView.findViewById(R.id.distanceid);
+                distancevalue=(TextView) itemView.findViewById(R.id.distancevalue);
+                fbeventpath=(TextView) itemView.findViewById(R.id.fbeventPath);
+                longitude=(TextView) itemView.findViewById(R.id.fbeventLong);
+                latitude=(TextView) itemView.findViewById(R.id.fbeventLat);
+                description=(TextView) itemView.findViewById(R.id.fbeventDesc);
             }
         }
 

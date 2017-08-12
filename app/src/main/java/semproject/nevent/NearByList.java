@@ -34,17 +34,17 @@ import static semproject.nevent.Recent.extracteventOrganizer;
 import static semproject.nevent.Recent.extractlatitude;
 import static semproject.nevent.Recent.extractlongitude;
 import static semproject.nevent.Recent.extractviewcount;
-import static semproject.nevent.Userdetail.fbeventCategory;
-import static semproject.nevent.Userdetail.fbeventDate;
-import static semproject.nevent.Userdetail.fbeventId;
-import static semproject.nevent.Userdetail.fbeventList;
-import static semproject.nevent.Userdetail.fbeventLocation;
-import static semproject.nevent.Userdetail.fbevent_descrp;
-import static semproject.nevent.Userdetail.fbevent_org;
-import static semproject.nevent.Userdetail.fbevent_picpath;
-import static semproject.nevent.Userdetail.fblatitude;
-import static semproject.nevent.Userdetail.fblongitude;
-import static semproject.nevent.Userdetail.fbviewcount;
+import static semproject.nevent.FacebookEvents.fbeventCategory;
+import static semproject.nevent.FacebookEvents.fbeventDate;
+import static semproject.nevent.FacebookEvents.fbeventId;
+import static semproject.nevent.FacebookEvents.fbeventList;
+import static semproject.nevent.FacebookEvents.fbeventLocation;
+import static semproject.nevent.FacebookEvents.fbevent_descrp;
+import static semproject.nevent.FacebookEvents.fbevent_org;
+import static semproject.nevent.FacebookEvents.fbevent_picpath;
+import static semproject.nevent.FacebookEvents.fblatitude;
+import static semproject.nevent.FacebookEvents.fblongitude;
+import static semproject.nevent.FacebookEvents.fbviewcount;
 
 
 /**
@@ -130,16 +130,16 @@ public class NearByList extends Fragment implements ConnectivityReceiver.Connect
                     dist = ShowEvents.fbdistance.get(i) / 1000;
                     DecimalFormat numberformat= new DecimalFormat("#.00");
                     dist=Float.parseFloat(numberformat.format(dist));
-                    staticeventRecyclerView.initializeDataFacebook(neareventId.get(i),neareventList.get(i),neareventCategory.get(i),neareventLocation.get(i),neareventDate.get(i),neareventOrganizer.get(i),nearviewcount.get(i),nearlatitude.get(i),nearlongitude.get(i),neareventPath.get(i),neareventDescrip.get(i),getContext());
-                    EventRecyclerView.FacebookItemAdapter fbadapter = new EventRecyclerView.FacebookItemAdapter(getContext(), staticeventRecyclerView.getItemFacebook(),username);
+                    staticeventRecyclerView.initializeDataFacebook(neareventId.get(i),neareventList.get(i),neareventCategory.get(i),neareventLocation.get(i),neareventDate.get(i),neareventOrganizer.get(i),nearviewcount.get(i),nearlatitude.get(i),nearlongitude.get(i),neareventPath.get(i),neareventDescrip.get(i),getContext(),dist);
+                    EventRecyclerView.FacebookItemAdapter fbadapter = new EventRecyclerView.FacebookItemAdapter(getContext(), staticeventRecyclerView.getItemFacebook(),username,true);
                     mfbRecyclerView.setAdapter(fbadapter);
                 }else{
                     Log.i("NFBIndexRemove "+i," "+neareventList.get(i));
                     dist = ShowEvents.distance.get(i) / 1000;
                     DecimalFormat numberformat= new DecimalFormat("#.00");
                     dist=Float.parseFloat(numberformat.format(dist));
-                    staticeventRecyclerView.initializeData(neareventId.get(i),neareventList.get(i),neareventCategory.get(i),neareventLocation.get(i),neareventDate.get(i),neareventOrganizer.get(i),nearviewcount.get(i),getContext(),dist);
-                    EventRecyclerView.AllItemAdapter adapter = new EventRecyclerView.AllItemAdapter(getContext(), staticeventRecyclerView.getItem(),username,true);
+                    staticeventRecyclerView.initializeData(neareventId.get(i),neareventList.get(i),neareventCategory.get(i),neareventLocation.get(i),neareventDate.get(i),neareventOrganizer.get(i),nearviewcount.get(i),getContext(),Float.toString(dist));
+                    EventRecyclerView.AllItemAdapter adapter = new EventRecyclerView.AllItemAdapter(getContext(), staticeventRecyclerView.getItem(),username,true,false);
                     mRecyclerView.setAdapter(adapter);}
 
             }

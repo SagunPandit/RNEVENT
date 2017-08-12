@@ -56,12 +56,12 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
     private static final String SERVER_ADDRESS="http://avsadh96.000webhostapp.com/";
     ImageView downloadedimage;
     TextView veventLabel,veventLocation,veventDate,veventOrganizer,veventCategory,veventId,veventDetails,attendingtext, participantnumber;
-    Button attendingbutton;
+    Button attendingbutton, invitebutton;
     Friendinvite friendinvite;
     static public RecyclerView mRecyclerView;
     //public RecyclerView.Adapter mAdapter;
     Bitmap eventImage;
-    String eventId, eventLabel, eventLocation, eventDate, eventPath,eventOrganizer, eventCategory,eventDetails,eventLatitude, eventLongitude, username;
+    String eventId, eventLabel, eventLocation, eventDate, eventPath,eventOrganizer, eventCategory,eventDetails,eventLatitude, eventLongitude, username,attendingcount;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +77,7 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
         attendingbutton=(Button) findViewById(R.id.going);
         attendingtext=(TextView) findViewById(R.id.attend);
         participantnumber=(TextView) findViewById(R.id.goingnumber);
+        invitebutton= (Button) findViewById(R.id.invite_button);
 
         Intent intent = getIntent();
         username=intent.getStringExtra("username");
@@ -93,6 +94,13 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
             eventLatitude = intent.getStringExtra("latitude");
             eventLongitude = intent.getStringExtra("longitude");
             eventPath = intent.getStringExtra("path");
+            attendingcount=intent.getStringExtra("attendingcount");
+            participantnumber.setText(attendingcount);
+            attendingbutton.setVisibility(View.GONE);
+            attendingtext.setVisibility(View.GONE);
+            invitebutton.setVisibility(View.GONE);
+
+
             /*try{
                 eventImage=intent.getParcelableExtra("eventImage");
                 downloadedimage.setImageBitmap(eventImage);
@@ -306,6 +314,7 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
         EventRecyclerView inviterecyclerview = new EventRecyclerView();
         EventRecyclerView.FollowItemAdapter adapter;
         String username,eventID;
+        Boolean showtoast=false;
         public Friendinvite()
         {
         }
@@ -324,17 +333,19 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
                                 Log.e(STRING_TAG,names);
                             }
                             selecctedUser.clear();
-                            String toastMesg = "Thanks for promoting events!!";
-                            Toast toast = Toast.makeText(getContext().getApplicationContext(), toastMesg, Toast.LENGTH_SHORT);
-                            TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
-                            if (v != null) v.setGravity(Gravity.CENTER);
-                            toast.show();
-
+                            if(showtoast) {
+                                String toastMesg = "Thanks for promoting events!!";
+                                Toast toast = Toast.makeText(getContext().getApplicationContext(), toastMesg, Toast.LENGTH_SHORT);
+                                TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
+                                if (v != null) v.setGravity(Gravity.CENTER);
+                                toast.show();
+                            }
                             Log.e(STRING_TAG,"Inside dialog box");
                         }
                     })
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {// User cancelled the dialog
+                        public void onClick(DialogInterface dialog, int id) {
+                            selecctedUser.clear();// User cancelled the dialog
                         }
                     });
             LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -358,6 +369,7 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
         void setAdapterforInvite(){
             List<EventRecyclerView.Item_follow> extractedItem=stat_forinvite_eventRecyclerView.getItemFollow();
             for(EventRecyclerView.Item_follow indevent: extractedItem){
+                Log.e("Invite","started");
                 inviterecyclerview.initializeDataFollow(indevent.followuserid,indevent.followusername,indevent.followemail,getContext());
                 adapter = new EventRecyclerView.FollowItemAdapter(indevent.context.getApplicationContext(), inviterecyclerview.getItemFollow(),username,true);
                 mRecyclerView.setAdapter(adapter);
@@ -375,6 +387,7 @@ public class EventDetails extends AppCompatActivity implements ConnectivityRecei
                         JSONObject jsonObject=new JSONObject(response);
                         boolean success = jsonObject.getBoolean("success1");
                         if(success){
+                            showtoast=true;
                             Log.e(STRING_TAG,"insideSuccess");
                         }
                         else {

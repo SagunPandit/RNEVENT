@@ -1,8 +1,11 @@
 package semproject.nevent;
 
-
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -33,12 +36,9 @@ import static semproject.nevent.HomePage.staticadapter;
 import static semproject.nevent.HomePage.staticeventRecyclerView;
 
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class Donations extends Fragment implements ConnectivityReceiver.ConnectivityReceiverListener {
+public class Invite extends Fragment implements ConnectivityReceiver.ConnectivityReceiverListener {
     private RecyclerView mRecyclerView;
-    String STRING_TAG="DONATIONS";
+    String STRING_TAG="Invite";
     String username;
     List<String> eventId=new ArrayList<>();
     List<String>eventList=new ArrayList<>();
@@ -46,25 +46,25 @@ public class Donations extends Fragment implements ConnectivityReceiver.Connecti
     List<String>eventDate=new ArrayList<>();
     List<String>eventCategory=new ArrayList<>();
     List<String>eventOrganizer=new ArrayList<>();
+    List<String>invitedby=new ArrayList<>();
     List<Integer>viewcount=new ArrayList<>();
-    TextView denoteempty;
 
-    public Donations() {
+
+    public Invite() {
         staticeventRecyclerView=new EventRecyclerView();
         staticadapter=new EventRecyclerView.AllItemAdapter();
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                             Bundle savedInstanceState)
+    {
         username = getArguments().getString("username");
-        View rootView = inflater.inflate(R.layout.fragment_recent, container, false);
-        denoteempty= (TextView) rootView.findViewById(R.id.empty_text_allevents);
+        View rootView = inflater.inflate(R.layout.fragment_feed, container, false);
 
         // BEGIN_INCLUDE(initializeRecyclerView)
         RecyclerView.LayoutManager mLayoutManager;
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.all_recycler_view);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.feed_recycler_view);
         if (mRecyclerView != null) {
             mRecyclerView.setHasFixedSize(true);
         }
@@ -75,29 +75,28 @@ public class Donations extends Fragment implements ConnectivityReceiver.Connecti
         // elements are laid out.
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
-        listenerFunction(username);
+        Log.e(STRING_TAG,username);
+        feedListener(username);
         return rootView;
     }
+
     public void retreiveFromDatabase(RecyclerView mRecyclerView,Context context){
         Log.e(STRING_TAG,"database");
         if(checkConnection(getContext())){
-            if (eventList.isEmpty()){
-                denoteempty.setVisibility(View.VISIBLE);
-            }
             for (int i=0;i < eventList.size();i++)
             {
-                denoteempty.setVisibility(View.GONE);
                 Log.i("Value of element "+i,eventList.get(i));
-                staticeventRecyclerView.initializeData(eventId.get(i),eventList.get(i),eventCategory.get(i),eventLocation.get(i),eventDate.get(i),eventOrganizer.get(i),viewcount.get(i),context,"");
-                staticadapter = new EventRecyclerView.AllItemAdapter(context, staticeventRecyclerView.getItem(),username,false,false);
+                staticeventRecyclerView.initializeData(eventId.get(i),eventList.get(i),eventCategory.get(i),eventLocation.get(i),eventDate.get(i),eventOrganizer.get(i),viewcount.get(i),context,invitedby.get(i));
+                staticadapter = new EventRecyclerView.AllItemAdapter(context, staticeventRecyclerView.getItem(),username,false,true);
                 mRecyclerView.setAdapter(staticadapter);
             }
         }
 
     }
 
-    public void listenerFunction(String username){
+    public void feedListener(final String username){
         Log.e(STRING_TAG,"insideListiner");
+
         Response.Listener<String> responseListener= new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -105,6 +104,8 @@ public class Donations extends Fragment implements ConnectivityReceiver.Connecti
                     Log.e(STRING_TAG,"try");
                     JSONObject jsonObject=new JSONObject(response);
                     boolean success = jsonObject.getBoolean("success");
+                    //String fromwhere= jsonObject.getString("where");
+                    //Log.e("WHERE",fromwhere);
                     if(success){
                         Log.e(STRING_TAG,"insideSuccess");
                         JSONArray jsonArray = jsonObject.getJSONArray("event_name");
@@ -114,6 +115,7 @@ public class Donations extends Fragment implements ConnectivityReceiver.Connecti
                         JSONArray jsonArray5 = jsonObject.getJSONArray("event_organizer");
                         JSONArray jsonArray6 = jsonObject.getJSONArray("event_id");
                         JSONArray jsonArray7 = jsonObject.getJSONArray("viewcount");
+                        JSONArray jsonArray8 = jsonObject.getJSONArray("invitedby");
                         if (jsonArray != null) {
                             int len = jsonArray.length();
                             Log.e(STRING_TAG,Integer.toString(len));
@@ -141,6 +143,10 @@ public class Donations extends Fragment implements ConnectivityReceiver.Connecti
                             for (int i=0;i<len;i++){
                                 eventOrganizer.add(jsonArray5.get(i).toString());
                             }
+                            //for invitedby
+                            for (int i=0;i<len;i++){
+                                invitedby.add(jsonArray8.get(i).toString());
+                            }
                             //for count
                             for (int i=0;i<len;i++){
                                 viewcount.add((Integer) jsonArray7.get(i));
@@ -165,10 +171,11 @@ public class Donations extends Fragment implements ConnectivityReceiver.Connecti
             }
         };
         if(checkConnection(getContext())){
-            RecyclerRequest recyclerRequest=new RecyclerRequest(username,"donations", responseListener);
+            RecyclerRequest recyclerRequest=new RecyclerRequest(username, "invite", responseListener);
             RequestQueue queue = Volley.newRequestQueue(getContext());
             queue.add(recyclerRequest);
         }
+
     }
 
     private boolean checkConnection(Context context) {
@@ -195,4 +202,5 @@ public class Donations extends Fragment implements ConnectivityReceiver.Connecti
 
         }
     }
+
 }

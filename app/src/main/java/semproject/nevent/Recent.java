@@ -112,11 +112,11 @@ public class Recent extends Fragment implements ConnectivityReceiver.Connectivit
             for (int i=0;i < eventList.size();i++)
             {
                 Log.i("Value of element "+i,eventList.get(i));
-                staticeventRecyclerView.initializeData(eventId.get(i),eventList.get(i),eventCategory.get(i),eventLocation.get(i),eventDate.get(i),eventOrganizer.get(i),viewcount.get(i),context,0);
-                stat_forsearch_eventRecyclerView.initializeData(eventId.get(i),eventList.get(i),eventCategory.get(i),eventLocation.get(i),eventDate.get(i),eventOrganizer.get(i),viewcount.get(i),context,0);
+                staticeventRecyclerView.initializeData(eventId.get(i),eventList.get(i),eventCategory.get(i),eventLocation.get(i),eventDate.get(i),eventOrganizer.get(i),viewcount.get(i),context,"");
+                stat_forsearch_eventRecyclerView.initializeData(eventId.get(i),eventList.get(i),eventCategory.get(i),eventLocation.get(i),eventDate.get(i),eventOrganizer.get(i),viewcount.get(i),context,"");
 
-                staticadapter = new EventRecyclerView.AllItemAdapter(context, staticeventRecyclerView.getItem(),username,false);
-                stat_forsearch_adapter = new EventRecyclerView.AllItemAdapter(context, staticeventRecyclerView.getItem(),username,false);
+                staticadapter = new EventRecyclerView.AllItemAdapter(context, staticeventRecyclerView.getItem(),username,false,false);
+                stat_forsearch_adapter = new EventRecyclerView.AllItemAdapter(context, staticeventRecyclerView.getItem(),username,false,false);
                 mRecyclerView.setAdapter(staticadapter);
             }
         }

@@ -13,13 +13,20 @@
         android:title="NearBy"
         android:icon="@drawable/nearby"
         myapp:actionViewClass="android.support.v7.widget.Button"
-        myapp:showAsAction="ifRoom" />
+        myapp:showAsAction="always" />
 
     <item android:id="@+id/action_invitation"
         android:title="Invitations"
         android:icon="@drawable/invites"
         myapp:actionViewClass="android.support.v7.widget.Button"
-        myapp:showAsAction="ifRoom" />
+        myapp:showAsAction="always" />
+    <item android:id="@+id/action_facebook"
+        android:title="Facebook"
+        android:icon="@drawable/fb48"
+        android:visible="false"
+        myapp:actionViewClass="android.support.v7.widget.Button"
+        myapp:showAsAction="always" />
+
 </menu>
 
 

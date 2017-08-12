@@ -208,7 +208,7 @@ public class Otheruserprofile extends AppCompatActivity implements ConnectivityR
                 {
 
                     Log.i("Value of element "+i,eventList.get(i));
-                    eventRecyclerView.initializeData(eventId.get(i),eventList.get(i),eventCategory.get(i),eventLocation.get(i),eventDate.get(i),otherusername,viewcount.get(i),this,0);
+                    eventRecyclerView.initializeData(eventId.get(i),eventList.get(i),eventCategory.get(i),eventLocation.get(i),eventDate.get(i),otherusername,viewcount.get(i),this,"");
                     RecyclerView.Adapter mAdapter = new EventRecyclerView.ItemAdapter(this, eventRecyclerView.getItem(),otherusername);
                     mRecyclerView.setAdapter(mAdapter);
                 }
@@ -217,8 +217,8 @@ public class Otheruserprofile extends AppCompatActivity implements ConnectivityR
                 for (int i=0;i < eventList.size();i++)
                 {
                     Log.i("Value of element "+i,eventList.get(i));
-                    eventRecyclerView.initializeData(eventId.get(i),eventList.get(i),eventCategory.get(i),eventLocation.get(i),eventDate.get(i),otherusername,viewcount.get(i),this,0);
-                    RecyclerView.Adapter mAdapter = new EventRecyclerView.AllItemAdapter(this, eventRecyclerView.getItem(),otherusername,false);
+                    eventRecyclerView.initializeData(eventId.get(i),eventList.get(i),eventCategory.get(i),eventLocation.get(i),eventDate.get(i),otherusername,viewcount.get(i),this,"");
+                    RecyclerView.Adapter mAdapter = new EventRecyclerView.AllItemAdapter(this, eventRecyclerView.getItem(),otherusername,false,false);
                     mRecyclerView.setAdapter(mAdapter);
                 }
             }
