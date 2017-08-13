@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/counterPanel"
-    android:layout_width="32dp"
-    android:layout_height="32dp"
-    android:background="@drawable/ic_menu_gallery">
+    android:layout_width="25dp"
+    android:layout_height="25dp">
 
     <RelativeLayout
         android:id="@+id/counterValuePanel"
@@ -13,12 +12,14 @@
 
         <TextView
             android:id="@+id/count"
+            android:gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="1"
-            android:textSize="100sp"
+            android:textSize="70sp"
+            android:background="@drawable/circle"
             android:layout_centerInParent="true"
-            android:textColor="#FFFFFF" />
+            android:textColor="#ffffff" />
     </RelativeLayout>
 
 </FrameLayout>
