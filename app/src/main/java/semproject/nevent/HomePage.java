@@ -6,9 +6,11 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -21,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -40,6 +43,8 @@ import java.util.List;
 import semproject.nevent.Connection.ConnectivityReceiver;
 import semproject.nevent.Connection.InternetConnection;
 import semproject.nevent.MapsActivities.ShowEvents;
+import semproject.nevent.Request.AttendingEventRequest;
+import semproject.nevent.Request.CheckinvitationsRequest;
 import semproject.nevent.Request.RecyclerRequest;
 
 public class HomePage extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,ConnectivityReceiver.ConnectivityReceiverListener{
@@ -150,8 +155,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.homepage, menu);
-        MenuItem menuItem = menu.findItem(R.id.action_invitation);
-        menuItem.setIcon(buildCounterDrawable(count,  R.drawable.invites));
+        new Checkinvitations(username,menu).execute();
         fb_icon=menu.findItem(R.id.action_facebook);
         updateWithToken(AccessToken.getCurrentAccessToken());
 /*        MenuItem menuItem=menu.findItem(R.id.action_search);
@@ -181,6 +185,7 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
                 break;
 
             case R.id.action_invitation:
+                setinviteseen(username,item);
                 Bundle bundle=new Bundle();
                 bundle.putString("username", username);
                 Invite invite=new Invite();
@@ -644,4 +649,98 @@ public class HomePage extends AppCompatActivity implements NavigationView.OnNavi
 
         return new BitmapDrawable(getResources(), bitmap);
     }
+
+
+    private class Checkinvitations extends AsyncTask<Void, Void, Bitmap> {
+        private final Menu menu;
+        String name;
+
+        public Checkinvitations(String name, Menu menu) {
+            this.name = name;
+            this.menu = menu;
+        }
+
+        @Override
+        protected Bitmap doInBackground(Void... params) {
+            try {
+
+                Response.Listener<String> responselistener = new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            Log.e(STRING_TAG, "going pressed");
+                            JSONObject jsonObject = new JSONObject(response);
+                            boolean success = jsonObject.getBoolean("success");
+
+                            int count = jsonObject.getInt("count");
+                            if (success) {
+                                Log.d("CHEck", "going button pressed"+count);
+                                MenuItem menuItem = menu.findItem(R.id.action_invitation);
+                                menuItem.setIcon(buildCounterDrawable(count, R.drawable.invites));
+
+                            } else {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(HomePage.this);
+                                builder.setMessage("Connection Failed")
+                                        .setNegativeButton("Retry", null)
+                                        .create()
+                                        .show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                };
+                if (checkConnection(HomePage.this)) {
+                    CheckinvitationsRequest checkinvitationsrequest = new CheckinvitationsRequest(name, "checkinvitation", responselistener);
+                    RequestQueue queue = Volley.newRequestQueue(HomePage.this);
+                    queue.add(checkinvitationsrequest);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();}
+                return null;
+
+
+
+    }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+        }
+    }
+
+    public void setinviteseen(String username, final MenuItem item)
+    {
+        Response.Listener<String> responselistener = new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    Log.e(STRING_TAG, "going pressed");
+                    JSONObject jsonObject = new JSONObject(response);
+                    boolean success = jsonObject.getBoolean("success");
+                    if (success)
+                    {
+                        item.setIcon(buildCounterDrawable(0, R.drawable.invites));
+
+                    } else {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(HomePage.this);
+                        builder.setMessage("Connection Failed")
+                                .setNegativeButton("Retry", null)
+                                .create()
+                                .show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        };
+        if (checkConnection(HomePage.this)) {
+            CheckinvitationsRequest checkinvitationsrequest = new CheckinvitationsRequest(username, "setinviteseen", responselistener);
+            RequestQueue queue = Volley.newRequestQueue(HomePage.this);
+            queue.add(checkinvitationsrequest);
+        }
+    }
+
 }
