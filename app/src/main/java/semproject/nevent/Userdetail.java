@@ -119,7 +119,7 @@ public class Userdetail extends Fragment implements ConnectivityReceiver.Connect
         }
 
 
-        // LinearLayoutManager is used here, this will layout the elements in a similar fashion
+        // LinearLayoutManager is used here, this will layout the elements in similar fashion
         // to the way ListView would layout elements. The RecyclerView.LayoutManager defines how
         // elements are laid out.
         mLayoutManager = new LinearLayoutManager(getActivity());
